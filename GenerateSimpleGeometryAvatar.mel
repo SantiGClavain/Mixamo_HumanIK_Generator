@@ -1,0 +1,183 @@
+/*
+Simple geometry avatar generator placeholder.
+Creates a basic hip cube for blocking out volumes.
+*/
+{
+
+string $hipmesh[] = `polyCube -n "Santi_Hip" -w 10 -h 10 -d 10 -sd 2 -sh 2 -sw 2`;
+string $hipMesh = $hipmesh[0];
+select -r ($hipMesh + ".vtx[0]");
+move -r 1.603671 90.978271 5.406257;
+select -r ($hipMesh + ".vtx[1]");
+move -r 0 90.978271 5.406257 ;
+select -r ($hipMesh + ".vtx[2]");
+move -r -1.603671 90.978271 5.406257 ;
+select -r ($hipMesh + ".vtx[3]");
+move -r -3.770861 95.258804 7.711913 ;
+select -r ($hipMesh + ".vtx[4]");
+move -r 0 95.258804 11.551558 ;
+select -r ($hipMesh + ".vtx[5]");
+move -r 3.770861 95.258804 7.711913 ;
+select -r ($hipMesh + ".vtx[6]");
+move -r -5.762618 98.824371 5.762618;
+select -r ($hipMesh + ".vtx[7]");
+move -r 3.33786e-06 97.096245 10.220635;
+select -r ($hipMesh + ".vtx[8]");
+move -r 5.762618 98.824371 5.762618;
+select -r ($hipMesh + ".vtx[9]");
+move -r -10.220634 103.345299 6.68745e-08 ;
+select -r ($hipMesh + ".vtx[10]");
+move -r 0 103.345299 1.67186e-08 ;
+select -r ($hipMesh + ".vtx[11]");
+move -r 10.220634 103.345299 6.68745e-08 ;
+select -r ($hipMesh + ".vtx[12]");
+move -r -5.762618 103.844025 -5.762618 ;
+select -r ($hipMesh + ".vtx[13]");
+move -r 0 103.844025 -10.220634 ;
+select -r ($hipMesh + ".vtx[14]");
+move -r 5.762618 103.844025 -5.762618 ;
+select -r ($hipMesh + ".vtx[15]");
+move -r -9.564365 95.258804 -5.617437 ;
+select -r ($hipMesh + ".vtx[16]");
+move -r 0 95.258804 -11.551558 ;
+select -r ($hipMesh + ".vtx[17]");
+move -r 9.564365 95.258804 -5.617437 ;
+select -r ($hipMesh + ".vtx[18]");
+move -r 1.603671 89.924149 -5.406257 ;
+select -r ($hipMesh + ".vtx[19]");
+move -r 0 89.924149 -5.406257 ;
+select -r ($hipMesh + ".vtx[20]");
+move -r -1.603671 89.924149 -5.406257 ;
+select -r ($hipMesh + ".vtx[21]");
+move -r 1.603671 83.707222 0 ;
+select -r ($hipMesh + ".vtx[22]");
+move -r 0 83.707222 0 ;
+select -r ($hipMesh + ".vtx[23]");
+move -r -1.603671 83.707222 0 ;
+select -r ($hipMesh + ".vtx[24]");
+move -r 11.551558 99.876961 0 ;
+select -r ($hipMesh + ".vtx[25]");
+move -r -11.551558 99.876961 0 ;
+select -r $hipMesh;
+
+
+string $sphereArray[] = {}; 
+
+string $toeSphereA[] = `polySphere -n "SantiToeSphere" -r 2.6 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 8.190498 3.331229 11.282167 ;
+string $toeSphere = $toeSphereA[0];
+$spheresArray[size($spheresArray)] = $toeSphere;
+
+string $ankleSphereA[] = `polySphere -n "SantiAnkleSphere" -r 4.15 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 8.831656 10.488149 -3.717397 ;
+string $ankleSphere = $ankleSphereA[0];
+$spheresArray[size($spheresArray)] = $ankleSphere;
+
+string $kneeSphereA[] = `polySphere -n "SantiKneeSphere" -r 6.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 9.369086 52.540054 -0.570068 ;
+string $kneeSphere = $kneeSphereA[0];
+$spheresArray[size($spheresArray)] = $kneeSphere;
+
+string $legSphereA[] = `polySphere -n "SantiLegSphere" -r 9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 8.607617 93.630066 -0.070569 ;
+string $legSphere = $legSphereA[0];
+$spheresArray[size($spheresArray)] = $legSphere;
+
+string $shoulderSphereA[] = `polySphere -n "SantiShoulderSphere" -r 5.5 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 18.760738 143.563858 -6.171442 ;
+string $shoulderSphere = $shoulderSphereA[0];
+$spheresArray[size($spheresArray)] = $shoulderSphere;
+
+string $elbowSphereA[] = `polySphere -n "SantiElbowSphere" -r 4.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 46.165443 143.561447 -6.171463 ;
+string $elbowSphere = $elbowSphereA[0];
+$spheresArray[size($spheresArray)] = $elbowSphere;
+
+string $handSphereA[] = `polySphere -n "SantiHandSphere" -r 2.75 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 73.779968 143.559006 -6.171491 ;
+string $handSphere = $handSphereA[0];
+$spheresArray[size($spheresArray)] = $handSphere;
+
+string $thumb1SphereA[] = `polySphere -n "SantiThumb1Sphere" -r 2.17 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 77.568542 141.391449 -3.168499 ;
+string $thumb1Sphere = $thumb1SphereA[0];
+$spheresArray[size($spheresArray)] = $thumb1Sphere;
+
+string $thumb2SphereA[] = `polySphere -n "SantiThumb2Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 81.243759 139.269196 -1.046493 ;
+string $thumb2Sphere = $thumb2SphereA[0];
+$spheresArray[size($spheresArray)] = $thumb2Sphere;
+
+string $thumb3SphereA[] = `polySphere -n "SantiThumb3Sphere" -r 1 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 84.637993 137.309113 0.913225 ;
+string $thumb3Sphere = $thumb3SphereA[0];
+$spheresArray[size($spheresArray)] = $thumb3Sphere; 
+
+string $index1SphereA[] = `polySphere -n "SantiIndex1Sphere" -r 1.4 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 86.046387 143.326157 -3.34943 ;
+string $index1Sphere = $index1SphereA[0];
+$spheresArray[size($spheresArray)] = $index1Sphere;
+
+string $index2SphereA[] = `polySphere -n "SantiIndex2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 89.938477 143.325806 -3.34946 ;
+string $index2Sphere = $index2SphereA[0];
+$spheresArray[size($spheresArray)] = $index2Sphere; 
+
+string $index3SphereA[] = `polySphere -n "SantiIndex3Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 93.353607 143.3255 -3.349488 ;
+string $index3Sphere = $index3SphereA[0];
+$spheresArray[size($spheresArray)] = $index3Sphere; 
+
+string $middle1SphereA[] = `polySphere -n "SantiMiddle1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 86.55542 143.557922 -6.171548 ;
+string $middle1Sphere = $middle1SphereA[0];
+$spheresArray[size($spheresArray)] = $middle1Sphere;
+
+string $middle2SphereA[] = `polySphere -n "SantiMiddle2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 90.169388 143.557602 -6.171496 ;
+string $middle2Sphere = $middle2SphereA[0];
+$spheresArray[size($spheresArray)] = $middle2Sphere;
+
+string $middle3SphereA[] = `polySphere -n "SantiMiddle3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 93.629112 143.55722 -6.171623 ;
+string $middle3Sphere = $middle3SphereA[0];
+$spheresArray[size($spheresArray)] = $middle3Sphere;
+
+string $ring1SphereA[] = `polySphere -n "SantiRing1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 85.92688 143.568024 -8.388193 ;
+string $ring1Sphere = $ring1SphereA[0];
+$spheresArray[size($spheresArray)] = $ring1Sphere;
+
+string $ring2SphereA[] = `polySphere -n "SantiRing2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 89.528122 143.567673 -8.388186 ;
+string $ring2Sphere = $ring2SphereA[0];
+$spheresArray[size($spheresArray)] = $ring2Sphere;
+
+string $ring3SphereA[] = `polySphere -n "SantiRing3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 92.835281 143.567291 -8.388219 ;
+string $ring3Sphere = $ring3SphereA[0];
+$spheresArray[size($spheresArray)] = $ring3Sphere;
+
+string $pinky1SphereA[] = `polySphere -n "SantiPinky1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 84.688087 143.33197 -10.897327 ;
+string $pinky1Sphere = $pinky1SphereA[0];
+$spheresArray[size($spheresArray)] = $pinky1Sphere;
+
+string $pinky2SphereA[] = `polySphere -n "SantiPinky2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 88.824699 143.331573 -10.89854 ;
+string $pinky2Sphere = $pinky2SphereA[0];
+$spheresArray[size($spheresArray)] = $pinky2Sphere;
+
+string $pinky3SphereA[] = `polySphere -n "SantiPinky3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+move -rpr 91.419487 143.331375 -10.897312 ;
+string $pinky3Sphere = $pinky3SphereA[0];
+$spheresArray[size($spheresArray)] = $pinky3Sphere;
+
+select -r $spheresArray;
+string $leftSidePoly[] = `polyUnite -ch 1 -mergeUVSets 1 -objectPivot -n "SantiLeftSide"`;
+DeleteHistory;
+polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1 $leftSidePoly[0];
+polySoftEdge -a 180 -ch 1 ($leftSidePoly[0] + ".e[0:8359]");
+select -r $leftSidePoly[0];
+
+}

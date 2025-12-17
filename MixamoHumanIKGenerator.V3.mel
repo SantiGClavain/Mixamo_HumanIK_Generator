@@ -1,0 +1,627 @@
+/*
+Santi Mixamo HumanIK Generator V3:
+Santi Mixamo HumanIK Generator es una  ventana que contiene un par de grupos de �tiles comandos:
+
+1) "Human IK Creation Controls":    
+    Este grupo de comandos facilita el trabajo laborioso de crear Human IK Generators seleccionando el hip de un esqueleto de Mixamo y con el nombre que le pongamos en el "Character Name"
+
+2) "Offset Animation COntrols":
+    Este super grupo de comandos lo que hace es seleccionar el primer Keyframe del esqueleto y moverlo una cantidad de frames dado en la ventana "Animation Offset" o bien movi�ndolo al frame actual. Es tremendamente r�pido teniendo en cuenta como se hace de forma manual y la precisi�n que hay que tener a ojo.
+    Este grupo de funciones es muy �til sobre todo para hacer una librer�a de animaciones para un personaje, o bien para hacer una animaci�n compuesta mezclando animaciones previas para un personaje.
+
+
+NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta la posibilidad de que haya m�s de un esqueleto de Mixamo seleccionado en escena se emplea el uso de NameSpaces (se genera uno de forma temporal para hacer lo que le queremos mandar y luego vuelve a tener el que ten�a, si es que lo ten�a)
+*/
+
+{
+    {
+        string $windowName = "Santi_Mixamo_HumanIK_Generator";
+        if (`window -exists $windowName`)        //INIT WINDOW SINGLETON
+        {
+            deleteUI $windowName;  
+        }                                         //END WINDOW SINGLETON
+        window -t "Santi Mixamo HumanIK Generator" $windowName;
+        	
+        	
+        columnLayout;
+            text -fn boldLabelFont -w 150 -h 30 "Human IK Creation Controls";          
+            string $charTextFieldGrp = `textFieldGrp -l "Character Name" -cat 1 left 20 -cal 1 left -cw 1 100 "CharName"`;                
+            
+            rowLayout -nc 2 -cat 1 left 155;
+                text  "Select Character Hip and...";  
+                string $goButton = `button -bgc 0.2 0.8 0.2 -l "Press Button"`;
+            setParent..;
+        
+            text -fn boldLabelFont -w 150 -h 30 "Offset Animation Controls ";                
+            rowLayout -nc 2 -cat 1 left 35;
+                text  -w 100 -bgc 0.50 0.80 1 "Animation Offset";  
+                string $OffsetFrameIntFieldGrp = `intField -v 0 "OffsetTime"`;
+            setParent..;
+            
+  //          string $OffsetFrameIntFieldGrp = `intFieldGrp -v1 0 -bgc 0.50 0.80 1 -cat 1 left 20 -cal 1 left -cw 1 100 -l "Offset Animation" "OffsetTime"`;                 
+            
+            rowLayout -nc 2 -cat 1 left 35;
+                text  -h 30 "Select Character Hip and press to set Offset to...";  
+                string $offsetButton = `button -bgc 0.50 0.80 1 -l "Animation Offset"`;                        
+            setParent..;
+            rowLayout -nc 2 -cat 1 left 35;
+                text  -h 30 "Select Character Hip and press to set Offset to...";  
+                string $offsetCurrentTimeButton = `button -l "CurrentTime" -bgc 0.8 0.3 0.3 -w 85 -c ("SetAnimationToCurrentFrame")`;                                                        
+            setParent..;                                                
+            
+        setParent..;
+        
+        button -e -c ("StartHumanIKGeneratorCheck " + $charTextFieldGrp) $goButton; // EDIT =         button -e -c ("StartHumanIKGenerator " + $charTextFieldGrp + " " + $OffsetFrameIntFieldGrp) $goButton;
+        button -e -c ("CharacterKeyFrameOffsetWindow " + $OffsetFrameIntFieldGrp) $offsetButton;        
+        
+        int $wWidth = 350 ;
+        int $wHeight = 200 ;
+        
+                    
+        showWindow $windowName;
+        window -e -wh $wWidth $wHeight $windowName;	 
+
+    
+    }
+    
+    proc StartHumanIKGeneratorCheck (string $nameCharacterTxtFieldGrp)  /// EDIT     proc StartHumanIKGenerator (string $nameCharacterTxtFieldGrp, string $offsetIntGrpName)  
+    {
+        string $nameCharacterTxtFieldGrpText = `textFieldGrp -q -tx $nameCharacterTxtFieldGrp`;
+        if ($nameCharacterTxtFieldGrpText == "" ) 
+        {
+            //print ("\n Error: Character Name Input Field is Empty, please set a valid name");
+            //return;
+            string $sceneName = `file -q -ns`;
+            textFieldGrp -e -tx ($sceneName + " CS") $nameCharacterTxtFieldGrp;
+            StartHumanIKGeneratorCheck ($nameCharacterTxtFieldGrp);
+            return;
+        }
+        
+        //Chekeamos que no hay ningun HikCharacter con el mismo nombre que el que hemos puesto en el field $nameCharacterTxtFieldGrp
+        string $hikCharList[] = `hikGetSceneCharacters`;
+        for( $hikCharName in $hikCharList)
+        {
+             if ($hikCharName == $nameCharacterTxtFieldGrpText)
+             {
+               print ("\n ERROR: There are another hikCharacter named " + $nameCharacterTxtFieldGrpText + ". Please choose another name in the Character Name Field");
+               return;  
+             }   
+        }
+  
+        string $sel[] = `ls -sl`;
+        string $hips = $sel[0];
+        
+        SetTemporalNamespace ($hips);
+                        
+        ResetMixamoCharacter ($nameCharacterTxtFieldGrpText);    //EDIT         ResetMixamoCharacter ($nameCharacterTxtFieldGrpText, $offsetTimeFrameGrpValue);    
+    
+    }
+    
+    proc CreateMixamoHumanIK (string $hipJoint, string $character)    //Esta funci�n sirve para crear un Human IK a partir de una jerarqu�a de mixamo, tiene en cuenta si tiene namespace, pero no tiene en cuenta la ruta completa de los nombres cuando hay m�s de un esqueleto en escena.
+    {    
+          
+        //Esto es para detectar si hay un root INIT
+        
+        string $nameSpaceList[] = `ls -showNamespace $hipJoint`;
+        int $isRoot = 0;
+        string $twoDot = ":";   
+        string $nameSpace = $nameSpaceList[1];
+        print ("\n Namespace is: " + $nameSpace);
+        select -r $hipJoint;
+        string $parentHipList[] = `pickWalk -d up`;
+        string $parentHip = $parentHipList[0];
+        if($parentHip != $hipJoint)
+        {
+            string $rootObject = $parentHip;
+            print ("\n Root object is = " + $rootObject);
+            $isRoot = 1;
+        }
+        
+              
+        //Esto es para detectar si hay un root END
+                
+        string $characterName = `hikCreateCharacter($character)`;        
+        string $jointList[] = `listRelatives -ad -type "joint" $hipJoint`;
+        setCharacterObject($hipJoint,$characterName,1,0);
+        
+        if($isRoot == 1)
+        {
+            setCharacterObject($parentHip,$characterName,0,0);
+        }
+        
+        for($joint in $jointList)
+        {
+            if($joint == ($nameSpace+$twoDot+"Spine"))
+            {
+                setCharacterObject($joint,$characterName,8,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"Spine1"))
+            {
+                setCharacterObject($joint,$characterName,23,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"Spine2"))
+            {
+                setCharacterObject($joint,$characterName,24,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftShoulder"))
+            {
+                setCharacterObject($joint,$characterName,18,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightShoulder"))
+            {
+                setCharacterObject($joint,$characterName,19,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftArm"))
+            {
+                setCharacterObject($joint,$characterName,9,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightArm"))
+            {
+                setCharacterObject($joint,$characterName,12,0);
+            }       
+            else if ($joint == ($nameSpace+$twoDot+"LeftForeArm"))
+            {
+                setCharacterObject($joint,$characterName,10,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightForeArm"))
+            {
+                setCharacterObject($joint,$characterName,13,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHand"))
+            {
+                setCharacterObject($joint,$characterName,11,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHand"))
+            {
+                setCharacterObject($joint,$characterName,14,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandThumb1"))
+            {
+                setCharacterObject($joint,$characterName,50,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandThumb1"))
+            {
+                setCharacterObject($joint,$characterName,74,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandThumb2"))
+            {
+                setCharacterObject($joint,$characterName,51,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandThumb2"))
+            {
+                setCharacterObject($joint,$characterName,75,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandThumb3"))
+            {
+                setCharacterObject($joint,$characterName,52,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandThumb3"))
+            {
+                setCharacterObject($joint,$characterName,76,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandThumb4"))
+            {
+                setCharacterObject($joint,$characterName,53,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandThumb4"))
+            {
+                setCharacterObject($joint,$characterName,77,0);
+            }
+             
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandIndex1"))
+            {
+                setCharacterObject($joint,$characterName,54,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandIndex1"))
+            {
+                setCharacterObject($joint,$characterName,78,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandIndex2"))
+            {
+                setCharacterObject($joint,$characterName,55,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandIndex2"))
+            {
+                setCharacterObject($joint,$characterName,79,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandIndex3"))
+            {
+                setCharacterObject($joint,$characterName,56,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandIndex3"))
+            {
+                setCharacterObject($joint,$characterName,80,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandIndex4"))
+            {
+                setCharacterObject($joint,$characterName,57,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandIndex4"))
+            {
+                setCharacterObject($joint,$characterName,81,0);
+            }
+            
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandMiddle1"))
+            {
+                setCharacterObject($joint,$characterName,58,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandMiddle1"))
+            {
+                setCharacterObject($joint,$characterName,82,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandMiddle2"))
+            {
+                setCharacterObject($joint,$characterName,59,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandMiddle2"))
+            {
+                setCharacterObject($joint,$characterName,83,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandMiddle3"))
+            {
+                setCharacterObject($joint,$characterName,60,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandMiddle3"))
+            {
+                setCharacterObject($joint,$characterName,84,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandMiddle4"))
+            {
+                setCharacterObject($joint,$characterName,61,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandMiddle4"))
+            {
+                setCharacterObject($joint,$characterName,85,0);
+            }  
+            
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandRing1"))
+            {
+                setCharacterObject($joint,$characterName,62,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandRing1"))
+            {
+                setCharacterObject($joint,$characterName,86,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandRing2"))
+            {
+                setCharacterObject($joint,$characterName,63,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandRing2"))
+            {
+                setCharacterObject($joint,$characterName,87,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandRing3"))
+            {
+                setCharacterObject($joint,$characterName,64,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandRing3"))
+            {
+                setCharacterObject($joint,$characterName,88,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandRing4"))
+            {
+                setCharacterObject($joint,$characterName,65,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandRing4"))
+            {
+                setCharacterObject($joint,$characterName,89,0);
+            }
+            
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandPinky1"))
+            {
+                setCharacterObject($joint,$characterName,66,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandPinky1"))
+            {
+                setCharacterObject($joint,$characterName,90,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandPinky2"))
+            {
+                setCharacterObject($joint,$characterName,67,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandPinky2"))
+            {
+                setCharacterObject($joint,$characterName,91,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandPinky3"))
+            {
+                setCharacterObject($joint,$characterName,68,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandPinky3"))
+            {
+                setCharacterObject($joint,$characterName,92,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftHandPinky4"))
+            {
+                setCharacterObject($joint,$characterName,69,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightHandPinky4"))
+            {
+                setCharacterObject($joint,$characterName,93,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftUpLeg"))
+            {
+                setCharacterObject($joint,$characterName,2,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightUpLeg"))
+            {
+                setCharacterObject($joint,$characterName,5,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftLeg"))
+            {
+                setCharacterObject($joint,$characterName,3,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightLeg"))
+            {
+                setCharacterObject($joint,$characterName,6,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftFoot"))
+            {
+                setCharacterObject($joint,$characterName,4,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightFoot"))
+            {
+                setCharacterObject($joint,$characterName,7,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"LeftToeBase"))
+            {
+                setCharacterObject($joint,$characterName,16,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"RightToeBase"))
+            {
+                setCharacterObject($joint,$characterName,17,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"Neck"))
+            {
+                setCharacterObject($joint,$characterName,20,0);
+            }
+            else if ($joint == ($nameSpace+$twoDot+"Head"))
+            {
+                setCharacterObject($joint,$characterName,15,0);
+            }
+        }               
+        hikToggleLockDefinition();
+               
+        RemoveLastNamespace $hipJoint;
+    
+    }
+    
+    proc ResetMixamoCharacter (string $nameCharacterReset) //Esta funci�n selecciona toda la jerarqu�a de joints y las resetea, solo sirve para jerarqu�as exportadas de Mixamo -------- EDIT     proc ResetMixamoCharacter (string $nameCharacterReset, int $offsetFrame)
+    {
+        int $storedTime = `currentTime -query`;
+    
+        string $selectionList[] = `ls -sl`;
+        string $hipMixamoJoint = $selectionList[0];
+        
+        int $firstKF = GetFirstKey ($hipMixamoJoint);
+        
+        int $resetTime = $firstKF -20;
+    
+        currentTime $resetTime; 
+           
+        setAttr ($hipMixamoJoint + ".translateX") 0;
+        setAttr ($hipMixamoJoint + ".translateY") 99.672;
+        setAttr ($hipMixamoJoint + ".translateZ") 0; 
+        setAttr ($hipMixamoJoint + ".rotateX") 0;
+        setAttr ($hipMixamoJoint + ".rotateY") 0;
+        setAttr ($hipMixamoJoint + ".rotateZ") 0;
+        
+        string $jointList[] = `listRelatives -ad -type "joint" $hipMixamoJoint`;
+        
+        for($joint in $jointList)
+        {
+            setAttr ($joint + ".rotateX") 0;
+            setAttr ($joint + ".rotateY") 0;
+            setAttr ($joint + ".rotateZ") 0;
+        } 
+        
+        CreateMixamoHumanIK ($hipMixamoJoint, $nameCharacterReset);
+        
+        select -hierarchy;
+        timeSliderClearKey;  
+        
+        currentTime $storedTime;
+                             
+    }
+    
+    proc CharacterKeyFrameOffset (int $offsetTime) //Esta funci�n selecciona la jerarqu�a del objeto seleccionado y mueve todos los KF seleccionables una cantidad dada ($offsetTime)
+    {    
+        string $selList[] = `ls -sl`; 
+        string $jointHip = $selList[0];
+        select -r $jointHip;
+        
+        string $charSkeleton[] = `SelectHierarchy`;
+        
+        string $charAnimCurveList[] = `listConnections -type animCurve`;
+        for($anim in $charAnimCurveList)
+        {
+            keyframe -e -iub true -r -o over -tc $offsetTime $anim;
+        }
+    }
+    
+    proc CharacterKeyFrameOffsetWindow (string $offsetTimeGrp)
+    {   
+        int $offsetTime = `intField -q -v $offsetTimeGrp`; 
+        string $selList[] = `ls -sl`; 
+        string $jointHip = $selList[0];
+        select -r $jointHip;
+        
+        string $charSkeleton[] = `SelectHierarchy`;
+        
+        string $charAnimCurveList[] = `listConnections -type animCurve`;
+        for($anim in $charAnimCurveList)
+        {
+            keyframe -e -iub true -r -o over -tc $offsetTime $anim;
+        }
+    }
+    
+    proc SetAnimationToCurrentFrame ()        //
+    {
+       string $selList[] = `ls -sl`;
+       string $hipJoint = $selList[0];
+       
+       int $firstKey = `GetFirstKey $hipJoint`;
+       int $offsetToApply = `CalculeRelativeOffset $firstKey`;
+       
+       select -r $hipJoint;
+       
+       CharacterKeyFrameOffset($offsetToApply);    
+    }
+    
+    proc int GetFirstKey (string $jointHipGetFirstKey)        //Esta funci�n nos permite poder acceder al primer keyframe del channel box de una jerarqu�a y nos devuelve el frame que corresponde
+    {
+
+       int $storedTimelineMin = `playbackOptions -q -min`;
+       int $storedTimelineMax = `playbackOptions -q -max`;
+       select -r $jointHipGetFirstKey;
+       SelectHierarchy;
+       
+       setPlaybackRangeToMinMax;
+       
+       int $firstAnimationKey = `playbackOptions -q -min`;
+       
+       playbackOptions -min $storedTimelineMin -max $storedTimelineMax; 
+       
+       return $firstAnimationKey;          
+    }
+    
+    proc int CalculeRelativeOffset (int $firstKeyFrame)    //Esta funci�n toma el valor del current time y nos hace la diferencia respecto al valor $firstKeyFrame
+    {
+        int $OffsetToSet = 0;
+        int $currentKF =  `currentTime -q`;
+                
+        $OffsetToSet = ($currentKF - $firstKeyFrame);
+        
+        return $OffsetToSet;
+    }
+    
+    proc InvalidHikCharactersCleaner()
+    {
+        string $hikCharList[] = `hikGetSceneCharacters`;
+
+        for ($hikCharName in $hikCharList)
+        {
+            optionMenuGrp -e -v $hikCharName hikCharacterList;
+            hikUpdateCurrentCharacterFromUI();
+            hikGetCurrentCharacter;
+            int $isValid = `hikIsCharacterizationInValidOrWarningState`;
+            if($isValid == 0)
+            {
+                deleteCharacter($hikCharName);
+            }
+        }
+    }
+    
+    proc SetTemporalNamespace (string $hipObject)
+    {      
+        string $skeleton[] = `GetRealTransformHierarchy $hipObject`;
+        
+        string $temporalNamespace = "SantiTemporalNameSpace";
+        
+        string $namesp[] = `ls -showNamespace $skeleton[0]`;
+        
+        string $namespace = $namesp[1];
+        
+        $namespace = $namespace + ":" + $temporalNamespace;
+               
+        string $buffer[];
+        $buffer = stringToStringArray ($namespace, ":");    
+        
+        if (size($buffer) == 1) //
+        {
+            $temporalNamespace  = `GetSingleNamespace $temporalNamespace`;
+            
+        }
+        else{
+            
+            $temporalNamespace  = `GetSingleNamespace ($namespace + ":" + $temporalNamespace)`;
+        }                           
+        
+
+        int $i;
+        for ($i = 0; $i < size($skeleton); $i++ )
+        {
+            string $buffer[];
+            
+            $buffer = stringToStringArray ($skeleton[$i], ":");
+            int $size = `size $buffer`;
+           
+
+            $buffer =  stringToStringArray ($buffer[$size-1], "|");
+            $size = `size $buffer`;
+             
+            string $targetName = $buffer[$size-1];
+            string $renamedName = ($namespace + ":" + $targetName);
+            
+            if(`objExists $skeleton[$i]`){
+                rename $skeleton[$i] (":" + $renamedName);
+            }
+            $skeleton = `GetRealTransformHierarchy $skeleton[0]`;            
+        }
+       
+    }
+    
+    proc string[] GetRealTransformHierarchy (string $object)
+    {
+         
+         string $hierarchy[];
+         
+         $hierarchy[0] = $object;
+         
+         string $childrenList[] = `listRelatives -ad -f -type "transform"`;
+         int $i;
+         for ($i = 0; $i  < size($childrenList); $i++)
+         {
+             int $hierarchyIndex = $i + 1;
+             $hierarchy[$hierarchyIndex] = $childrenList[$i];             
+         }
+         
+         return $hierarchy;
+    }    
+    
+    proc string GetSingleNamespace (string $proposedNamespace)
+    {        
+        int $isNamespace = `namespace -exists (":" + $proposedNamespace)`;
+        if($isNamespace != 0)
+        {
+            $proposedNamespace = GetSingleNamespace($proposedNamespace + "Dup");  
+        }
+        
+        return $proposedNamespace;
+        
+    }
+    
+    proc RemoveLastNamespace (string $hipsTempNamespaced)
+    {
+        string $namesp[] = `ls -showNamespace $hipsTempNamespaced`;
+        string $buffer[];
+        string $namespace = $namesp[1];
+        
+        $buffer = stringToStringArray ($namespace, ":");    
+        
+        if (size($buffer) == 1) //
+        {
+            namespace -set ":";
+            namespace -mergeNamespaceWithParent -removeNamespace $namespace;
+            
+        }
+        else{
+            namespace -set ":";
+            namespace -mergeNamespaceWithParent -removeNamespace $namespace;
+        }
+               
+    }
+    
+    proc changeDrawStyleToBone ()
+    {
+        string $sel[] = `ls -sl`;
+        int $i = 0;
+    
+        for ($i = 0; size($sel); $i++)
+        {
+            setAttr ($sel[$i] + ".drawStyle") 0;
+        }
+    }  
+    
+    
+}

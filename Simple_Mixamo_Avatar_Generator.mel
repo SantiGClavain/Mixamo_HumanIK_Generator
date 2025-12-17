@@ -1,0 +1,90 @@
+/*
+Simple Mixamo Avatar generator
+*/
+{
+global proc GenerateMixamoSkeletor()
+{
+    string $previousNamespace = `namespaceInfo -currentNamespace`;
+    string $namespaceName = "mixamorig";
+    if (!`namespace -exists $namespaceName`) {
+        namespace -add $namespaceName;
+    }
+    namespace -set $namespaceName;
+
+    //Generamos el esqueleto base, empezando con el locator raiz
+    string $rigRootLoc[] = `spaceLocator -n "Skeleton_Root" -p 0 0 0`;
+
+    //Generamos primero lo que es el tronco
+    string $hipJoint = `joint -n "Hips" -rad 10 -p 0 99.792 0`;
+    string $spineJoint = `joint -n "Spine" -rad 10 -p 0 109.715 -1.227 -o -6.963 0 0`;
+    string $spine1Joint = `joint -n "Spine1" -rad 10 -p 0 121.361 -2.650 -o 0.022 0 0`;
+    string $spine2Joint = `joint -n "Spine2" -rad 10 -p 0 134.721 -4.276 -o 6.617 0 0`;
+    string $neckJoint = `joint -n "Neck" -rad 10 -p 0 149.753 -3.467 -o 0.324 0 0`;
+    string $headJoint = `joint -n "Head" -rad 10 -p 0 160.075 -0.325 -o 0 0 0`;
+    string $headTopEndJoint = `joint -n "HeadTopEnd" -rad 10 -p 0 178.550 6.312 -o 0 0 0`;
+
+    //Generamos la pierna izquierda
+    select -r $hipJoint;
+    string $leftUpLegJoint = `joint -n "LeftUpLeg" -rad 10 -p 9.124 93.135 -0.055 -o -0.728 0 -179.660`;
+    string $leftLegJoint = `joint -n "LeftLeg" -rad 10 -p 9.369 52.540 -0.570 -o -2.076 0.009 -0.679`;
+    string $leftFootJoint = `joint -n "LeftFoot" -rad 10 -p 9.124 10.492 -2.630 -o 65.468 -0.161 3.296`;
+    string $leftToeJoint = `joint -n "LeftToeBase" -rad 10 -p 9.498 3.284 11.337 -o 26.412 -3.227 -2.567`;
+    string $leftToeEndJoint = `joint -n "LeftToeEnd" -rad 10 -p 9.355908 3.108389 21.333958 -o 0 0 0`;
+
+    //Generamos el brazo izquierdo
+    select -r $spine2Joint;
+    string $leftShoulderJoint = `joint -n "LeftShoulder" -rad 10 -p 6.103 143.832 -3.571 -o -91.608 78.377 177.221`;
+    string $leftArmJoint = `joint -n "LeftArm" -rad 10 -p 18.758 143.566 -6.171 -o -1.204 0 11.611`;
+    string $leftForeArmJoint = `joint -n "LeftForeArm" -rad 10 -p 46.162 143.566 -6.171 -o 0 0 0`;
+    string $leftHandJoint = `joint -n "LeftHand" -rad 10 -p 73.777 143.566 -6.172 -o 0 0 0`;
+
+    //Generamos los dedos de la mano izquierda
+    string $leftHandThumb1Joint = `joint -n "LeftHandThumb1" -rad 10 -p 77.566 141.398 -3.169 -o 27.312 -12.921 23.413`;
+    string $leftHandThumb2Joint = `joint -n "LeftHandThumb2" -rad 10 -p 81.241 139.276 -1.047 -o 0 0 0`;
+    string $leftHandThumb3Joint = `joint -n "LeftHandThumb3" -rad 10 -p 84.636 137.317 0.913 -o 0 0 0`;
+    string $leftHandThumb4Joint = `joint -n "LeftHandThumb4" -rad 10 -p 87.315 135.770 2.460 -o 2.142 14.318 8.602`;
+
+    select -r $leftHandJoint;
+    string $leftHandIndex1Joint = `joint -n "LeftHandIndex1" -rad 10 -p 86.044 143.334 -3.350 -o 0 0 0`;
+    string $leftHandIndex2Joint = `joint -n "LeftHandIndex2" -rad 10 -p 89.936 143.334 -3.350 -o 0 0 0`;
+    string $leftHandIndex3Joint = `joint -n "LeftHandIndex3" -rad 10 -p 93.351 143.334 -3.350 -o 0 0 0`;
+    string $leftHandIndex4Joint = `joint -n "LeftHandIndex4" -rad 10 -p 96.429 143.334 -3.350 -o 0 0.459 0.003`;
+
+    select -r $leftHandJoint;
+    string $leftHandMiddle1Joint = `joint -n "LeftHandMiddle1" -rad 10 -p 86.552 143.566 -6.172 -o 0 0 0`;
+    string $leftHandMiddle2Joint = `joint -n "LeftHandMiddle2" -rad 10 -p 90.166 143.566 -6.172 -o 0 0 0`;
+    string $leftHandMiddle3Joint = `joint -n "LeftHandMiddle3" -rad 10 -p 93.626 143.566 -6.172 -o 0 0 0`;
+    string $leftHandMiddle4Joint = `joint -n "LeftHandMiddle4" -rad 10 -p 97.306 143.566 -6.172 -o 0 -0.525 -0.075`;
+
+    select -r $leftHandJoint;
+    string $leftHandRing1Joint = `joint -n "LeftHandRing1" -rad 10 -p 85.924 143.576 -8.388 -o 0 0 0`;
+    string $leftHandRing2Joint = `joint -n "LeftHandRing2" -rad 10 -p 89.525 143.576 -8.388 -o 0 0 0`;
+    string $leftHandRing3Joint = `joint -n "LeftHandRing3" -rad 10 -p 92.832 143.576 -8.388 -o 0 0 0`;
+    string $leftHandRing4Joint = `joint -n "LeftHandRing4" -rad 10 -p 96.493 143.576 -8.388 -o 0.02 0.848 0.088`;
+
+    select -r $leftHandJoint;
+    string $leftHandPinky1Joint = `joint -n "LeftHandPinky1" -rad 10 -p 84.685 143.339 -10.397 -o 0 0 0`;
+    string $leftHandPinky2Joint = `joint -n "LeftHandPinky2" -rad 10 -p 88.822 143.339 -10.397 -o 0 0 0`;
+    string $leftHandPinky3Joint = `joint -n "LeftHandPinky3" -rad 10 -p 91.417 143.339 -10.397 -o 0 0 0`;
+    string $leftHandPinky4Joint = `joint -n "LeftHandPinky4" -rad 10 -p 94.340 143.339 -10.397 -o 0 0 0`;
+
+    //Ahora hacemos Mirror de las partes izquierdas para generar las derechas
+    select -r $leftUpLegJoint;
+    mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
+
+    select -r $leftShoulderJoint;
+    mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
+
+    //Finalmente devolvemos el namespace previo
+    namespace -set $previousNamespace;
+
+    //Seleccionamos el hip joint y luego hacemos un select hierarchy
+    select -r $hipJoint;
+    select -hierarchy; 
+    setKeyframe -t 0 -at "rotate" -at "translate" -at "scale" ;
+
+    //dejamos seleccionado el rig root locator
+    select -r $rigRootLoc[0];
+    
+}
+}
