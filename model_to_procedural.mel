@@ -1,0 +1,46 @@
+// Generates a list describing each vertex index and its world position for the currently selected mesh.
+global proc string[] ModelToProcedural()
+{
+    string $meshShapes[] = `ls -sl -dag -type "mesh"`;
+    if (size($meshShapes) == 0)
+    {
+        warning "Select a polygon mesh (transform or shape) before running ModelToProcedural.";
+        return {};
+    }
+
+    string $mesh = $meshShapes[0];
+
+    int $vertexCountArr[] = `polyEvaluate -v $mesh`;
+    if (size($vertexCountArr) == 0)
+    {
+        warning ("Could not evaluate vertex count for " + $mesh);
+        return {};
+    }
+
+    int $vertexCount = $vertexCountArr[0];
+    string $vertexLines[];
+    int $idx = 0;
+    string $vertexComponent;
+    float $pos[];
+    string $line;
+
+    while ($idx < $vertexCount)
+    {
+        $vertexComponent = ($mesh + ".vtx[" + $idx + "]");
+        $pos = `pointPosition -w $vertexComponent`;
+           // Example per vertex:
+        // select -r mesh.vtx[idx];
+        // move -ws x y z;
+        $line = ("select -r ( +\".vtx[" + $idx + "]\" ); move -ws " + $pos[0] + " " + $pos[1] + " " + $pos[2] + ";");
+        $vertexLines[size($vertexLines)] = $line;
+        $idx++;
+    }
+
+    print ("ModelToProcedural output for " + $mesh + ":\n");
+    for ($line in $vertexLines)
+    {
+        print ($line + "\n");
+    }
+
+    return $vertexLines;
+}
