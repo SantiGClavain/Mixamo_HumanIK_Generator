@@ -2,89 +2,1517 @@
 Simple Mixamo Avatar generator
 */
 {
-global proc GenerateMixamoSkeletor()
-{
-    string $previousNamespace = `namespaceInfo -currentNamespace`;
-    string $namespaceName = "mixamorig";
-    if (!`namespace -exists $namespaceName`) {
-        namespace -add $namespaceName;
-    }
-    namespace -set $namespaceName;
+    string $avatarMesh =  `GenerateYBotMesh`;
+    string $skeletorArray[] =  `GenerateMixamoSkeletor`;
 
-    //Generamos el esqueleto base, empezando con el locator raiz
-    string $rigRootLoc[] = `spaceLocator -n "Skeleton_Root" -p 0 0 0`;
+    string $skeletorRoot = $skeletorArray[0];
 
-    //Generamos primero lo que es el tronco
-    string $hipJoint = `joint -n "Hips" -rad 10 -p 0 99.792 0`;
-    string $spineJoint = `joint -n "Spine" -rad 10 -p 0 109.715 -1.227 -o -6.963 0 0`;
-    string $spine1Joint = `joint -n "Spine1" -rad 10 -p 0 121.361 -2.650 -o 0.022 0 0`;
-    string $spine2Joint = `joint -n "Spine2" -rad 10 -p 0 134.721 -4.276 -o 6.617 0 0`;
-    string $neckJoint = `joint -n "Neck" -rad 10 -p 0 149.753 -3.467 -o 0.324 0 0`;
-    string $headJoint = `joint -n "Head" -rad 10 -p 0 160.075 -0.325 -o 0 0 0`;
-    string $headTopEndJoint = `joint -n "HeadTopEnd" -rad 10 -p 0 178.550 6.312 -o 0 0 0`;
+    string $joints[] = `listRelatives -ad -type "joint" $skeletorRoot`;
+    string $hipJoint = $joints[0]; // el m�s alto jer�rquicamente  
 
-    //Generamos la pierna izquierda
     select -r $hipJoint;
-    string $leftUpLegJoint = `joint -n "LeftUpLeg" -rad 10 -p 9.124 93.135 -0.055 -o -0.728 0 -179.660`;
-    string $leftLegJoint = `joint -n "LeftLeg" -rad 10 -p 9.369 52.540 -0.570 -o -2.076 0.009 -0.679`;
-    string $leftFootJoint = `joint -n "LeftFoot" -rad 10 -p 9.124 10.492 -2.630 -o 65.468 -0.161 3.296`;
-    string $leftToeJoint = `joint -n "LeftToeBase" -rad 10 -p 9.498 3.284 11.337 -o 26.412 -3.227 -2.567`;
-    string $leftToeEndJoint = `joint -n "LeftToeEnd" -rad 10 -p 9.355908 3.108389 21.333958 -o 0 0 0`;
+    select -add $avatarMesh;
 
-    //Generamos el brazo izquierdo
-    select -r $spine2Joint;
-    string $leftShoulderJoint = `joint -n "LeftShoulder" -rad 10 -p 6.103 143.832 -3.571 -o -91.608 78.377 177.221`;
-    string $leftArmJoint = `joint -n "LeftArm" -rad 10 -p 18.758 143.566 -6.171 -o -1.204 0 11.611`;
-    string $leftForeArmJoint = `joint -n "LeftForeArm" -rad 10 -p 46.162 143.566 -6.171 -o 0 0 0`;
-    string $leftHandJoint = `joint -n "LeftHand" -rad 10 -p 73.777 143.566 -6.172 -o 0 0 0`;
+    string $skinClusterA[] = `skinCluster  -bindMethod 0 -skinMethod 2 -normalizeWeights 1 -weightDistribution 1 -mi 4  -dr 0 -rui true -n "Santi_SkinCluster"`;
 
-    //Generamos los dedos de la mano izquierda
-    string $leftHandThumb1Joint = `joint -n "LeftHandThumb1" -rad 10 -p 77.566 141.398 -3.169 -o 27.312 -12.921 23.413`;
-    string $leftHandThumb2Joint = `joint -n "LeftHandThumb2" -rad 10 -p 81.241 139.276 -1.047 -o 0 0 0`;
-    string $leftHandThumb3Joint = `joint -n "LeftHandThumb3" -rad 10 -p 84.636 137.317 0.913 -o 0 0 0`;
-    string $leftHandThumb4Joint = `joint -n "LeftHandThumb4" -rad 10 -p 87.315 135.770 2.460 -o 2.142 14.318 8.602`;
-
-    select -r $leftHandJoint;
-    string $leftHandIndex1Joint = `joint -n "LeftHandIndex1" -rad 10 -p 86.044 143.334 -3.350 -o 0 0 0`;
-    string $leftHandIndex2Joint = `joint -n "LeftHandIndex2" -rad 10 -p 89.936 143.334 -3.350 -o 0 0 0`;
-    string $leftHandIndex3Joint = `joint -n "LeftHandIndex3" -rad 10 -p 93.351 143.334 -3.350 -o 0 0 0`;
-    string $leftHandIndex4Joint = `joint -n "LeftHandIndex4" -rad 10 -p 96.429 143.334 -3.350 -o 0 0.459 0.003`;
-
-    select -r $leftHandJoint;
-    string $leftHandMiddle1Joint = `joint -n "LeftHandMiddle1" -rad 10 -p 86.552 143.566 -6.172 -o 0 0 0`;
-    string $leftHandMiddle2Joint = `joint -n "LeftHandMiddle2" -rad 10 -p 90.166 143.566 -6.172 -o 0 0 0`;
-    string $leftHandMiddle3Joint = `joint -n "LeftHandMiddle3" -rad 10 -p 93.626 143.566 -6.172 -o 0 0 0`;
-    string $leftHandMiddle4Joint = `joint -n "LeftHandMiddle4" -rad 10 -p 97.306 143.566 -6.172 -o 0 -0.525 -0.075`;
-
-    select -r $leftHandJoint;
-    string $leftHandRing1Joint = `joint -n "LeftHandRing1" -rad 10 -p 85.924 143.576 -8.388 -o 0 0 0`;
-    string $leftHandRing2Joint = `joint -n "LeftHandRing2" -rad 10 -p 89.525 143.576 -8.388 -o 0 0 0`;
-    string $leftHandRing3Joint = `joint -n "LeftHandRing3" -rad 10 -p 92.832 143.576 -8.388 -o 0 0 0`;
-    string $leftHandRing4Joint = `joint -n "LeftHandRing4" -rad 10 -p 96.493 143.576 -8.388 -o 0.02 0.848 0.088`;
-
-    select -r $leftHandJoint;
-    string $leftHandPinky1Joint = `joint -n "LeftHandPinky1" -rad 10 -p 84.685 143.339 -10.397 -o 0 0 0`;
-    string $leftHandPinky2Joint = `joint -n "LeftHandPinky2" -rad 10 -p 88.822 143.339 -10.397 -o 0 0 0`;
-    string $leftHandPinky3Joint = `joint -n "LeftHandPinky3" -rad 10 -p 91.417 143.339 -10.397 -o 0 0 0`;
-    string $leftHandPinky4Joint = `joint -n "LeftHandPinky4" -rad 10 -p 94.340 143.339 -10.397 -o 0 0 0`;
-
-    //Ahora hacemos Mirror de las partes izquierdas para generar las derechas
-    select -r $leftUpLegJoint;
-    mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
-
-    select -r $leftShoulderJoint;
-    mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
-
-    //Finalmente devolvemos el namespace previo
-    namespace -set $previousNamespace;
-
-    //Seleccionamos el hip joint y luego hacemos un select hierarchy
-    select -r $hipJoint;
-    select -hierarchy; 
-    setKeyframe -t 0 -at "rotate" -at "translate" -at "scale" ;
-
-    //dejamos seleccionado el rig root locator
-    select -r $rigRootLoc[0];
+    string $skinCluster = $skinClusterA[0];
+/*
+    print ("SkinCLuster is: " + $skinCluster + "\n");
     
-}
+    print ("Skeletor Array is: \n");
+    int $i = 0;
+    for ($i = 0; $i < size($skeletorArray); $i++)
+    {
+        print ($skeletorArray[$i] + " " + string($i) + " \n");
+    }
+*/    
+
+    
+    //PESADO PROCEDURAL LEFT SIDE DE ABAJO HACIA ARRIBA INIT
+    //Para acceder a los Joints uso el Array $skeletorArray sabiendo que joint es cual por medio de su index
+    //TOE 
+    SetSkinWeightToOne  $skeletorArray 11 $skinCluster $avatarMesh 606 631;
+    
+    //FOOT
+    SetSkinWeightToOne  $skeletorArray 10 $skinCluster $avatarMesh 564 605;
+    SetSkinWeightToOne  $skeletorArray 10 $skinCluster $avatarMesh 1264 1355;
+
+    
+    //LEG
+    SetSkinWeightToOne  $skeletorArray 9 $skinCluster $avatarMesh 522 563;
+    SetSkinWeightToOne  $skeletorArray 9 $skinCluster $avatarMesh 1356 1447;
+    
+    //UPLEG
+    SetSkinWeightToOne  $skeletorArray 8 $skinCluster $avatarMesh 480 521;
+    SetSkinWeightToOne  $skeletorArray 8 $skinCluster $avatarMesh 1448 1539;
+    
+    //SHOULDER
+    SetSkinWeightToOne  $skeletorArray 13 $skinCluster $avatarMesh 1632 1723;
+    
+    //ARM        
+    SetSkinWeightToOne  $skeletorArray 14 $skinCluster $avatarMesh 0 31;
+    SetSkinWeightToOne  $skeletorArray 14 $skinCluster $avatarMesh 1724 1815; 
+    
+    //FOREARM        
+    SetSkinWeightToOne  $skeletorArray 15 $skinCluster $avatarMesh 32 63;
+    SetSkinWeightToOne  $skeletorArray 15 $skinCluster $avatarMesh 1816 1907; 
+    
+    //HAND        
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 64 89;
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 3012 3103;
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 2736 2827;   
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 2460 2551;
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 2184 2275;
+    SetSkinWeightToOne  $skeletorArray 16 $skinCluster $avatarMesh 1908 1999;
+    
+    //THUMBS
+    SetSkinWeightToOne  $skeletorArray 17 $skinCluster $avatarMesh 90 115;
+    SetSkinWeightToOne  $skeletorArray 17 $skinCluster $avatarMesh 2000 2091;
+    SetSkinWeightToOne  $skeletorArray 18 $skinCluster $avatarMesh 116 141;   
+    SetSkinWeightToOne  $skeletorArray 18 $skinCluster $avatarMesh 2092 2183;
+    SetSkinWeightToOne  $skeletorArray 19 $skinCluster $avatarMesh 142 167;
+    
+    //INDEX
+    SetSkinWeightToOne  $skeletorArray 21 $skinCluster $avatarMesh 168 193;
+    SetSkinWeightToOne  $skeletorArray 21 $skinCluster $avatarMesh 2276 2367;
+    SetSkinWeightToOne  $skeletorArray 22 $skinCluster $avatarMesh 194 219;   
+    SetSkinWeightToOne  $skeletorArray 22 $skinCluster $avatarMesh 2368 2459;
+    SetSkinWeightToOne  $skeletorArray 23 $skinCluster $avatarMesh 220 245;
+    
+    //MIDDLE
+    SetSkinWeightToOne  $skeletorArray 25 $skinCluster $avatarMesh 246 271;
+    SetSkinWeightToOne  $skeletorArray 25 $skinCluster $avatarMesh 2552 2643;
+    SetSkinWeightToOne  $skeletorArray 26 $skinCluster $avatarMesh 272 297;   
+    SetSkinWeightToOne  $skeletorArray 26 $skinCluster $avatarMesh 2644 2735;
+    SetSkinWeightToOne  $skeletorArray 27 $skinCluster $avatarMesh 298 323;
+    
+    //RING
+    SetSkinWeightToOne  $skeletorArray 29 $skinCluster $avatarMesh 324 349;
+    SetSkinWeightToOne  $skeletorArray 29 $skinCluster $avatarMesh 2828 2919;
+    SetSkinWeightToOne  $skeletorArray 30 $skinCluster $avatarMesh 350 375;   
+    SetSkinWeightToOne  $skeletorArray 30 $skinCluster $avatarMesh 2920 3011;
+    SetSkinWeightToOne  $skeletorArray 31 $skinCluster $avatarMesh 376 401;    
+    
+    //PINKY
+    SetSkinWeightToOne  $skeletorArray 33 $skinCluster $avatarMesh 402 427;
+    SetSkinWeightToOne  $skeletorArray 33 $skinCluster $avatarMesh 3104 3195;
+    SetSkinWeightToOne  $skeletorArray 34 $skinCluster $avatarMesh 428 453;   
+    SetSkinWeightToOne  $skeletorArray 34 $skinCluster $avatarMesh 3196 3287;
+    SetSkinWeightToOne  $skeletorArray 35 $skinCluster $avatarMesh 454 479;
+    
+    //PESADO PROCEDURAL LEFT SIDE DE ABAJO HACIA ARRIBA END
+    
+    //PESADO ELEMENTOS CENTRALES INIT
+    //HIP    
+    SetSkinWeightToOne  $skeletorArray 1 $skinCluster $avatarMesh 1540 1631;
+    SetSkinWeightToOne  $skeletorArray 1 $skinCluster $avatarMesh 5588 5613;
+    SetSkinWeightToOne  $skeletorArray 1 $skinCluster $avatarMesh 5312 5403;
+    
+    //SPINE
+    SetSkinWeightToOne  $skeletorArray 2 $skinCluster $avatarMesh 5614 5681;
+    
+    //NECK
+    SetSkinWeightToOne  $skeletorArray 5 $skinCluster $avatarMesh 5496 5587; 
+    
+    //HEAD
+    SetSkinWeightToOne  $skeletorArray 6 $skinCluster $avatarMesh 5844 5897;   
+
+    //PESADO ELEMENTOS CENTRALES END
+    
+    //Hacemos el mirror al conjunto From Left to Right
+    select -r $avatarMesh;
+    
+    doMirrorSkinWeightsArgList 3 { "YZ", "1", "1", "1", "3", "0", "1" };
+    
+    doBakeNonDefHistory( 1, {"prePost" });
+    
+    select -r $skeletorRoot;
+    CreateHumanIKProceduralAvatar;
+    
+    print ("Done");
+            
+global proc string GenerateYBotMesh()  //Mirar de ponerle un nombre por medio de variable
+    {
+        string $resultAvatarMesh = "";
+
+        string $bodyCentalMeshesArray[];
+        string $hipMeshA[] = `polyCube -n "Santi_Hip" -w 10 -h 10 -d 10 -sd 2 -sh 2 -sw 2`;
+        string $hipMesh = $hipMeshA[0];
+        $bodyCentalMeshesArray[size($bodyCentalMeshesArray)] = $hipMesh;
+        int $hipDelFaces[] = {0, 2, 4, 6, 8, 10, 12, 14, 20, 21, 22, 23};
+        select -cl;
+        for ($faces in $hipDelFaces){select -add ($hipMesh + ".f[" + $faces +"]");}
+        doDelete;
+        select -r ($hipMesh + ".vtx[0]");move -r 0 92.404579 5.406258 ;
+        select -r ($hipMesh + ".vtx[1]");move -r -1.603671 92.830582 4.461596 ;
+        select -r ($hipMesh + ".vtx[2]");move -r 0 95.258804 9.858058 ;
+        select -r ($hipMesh + ".vtx[3]");move -r 3.623128 95.725235 6.288576 ;
+        select -r ($hipMesh + ".vtx[4]");move -r 3.33786e-06 97.096245 9.7336 ;
+        select -r ($hipMesh + ".vtx[5]");move -r 5.208965 98.824371 5.762618 ;
+        select -r ($hipMesh + ".vtx[6]");move -r 0 103.345299 1.67186e-08 ;
+        select -r ($hipMesh + ".vtx[7]");move -r 10.079893 103.345299 6.68745e-08 ;
+        select -r ($hipMesh + ".vtx[8]");move -r 0 103.844025 -10.220634 ;
+        select -r ($hipMesh + ".vtx[9]");move -r 5.762618 103.844025 -5.762618 ;
+        select -r ($hipMesh + ".vtx[10]");move -r 0 95.258804 -10.276634 ;
+        select -r ($hipMesh + ".vtx[11]");move -r 5.775412 95.258804 -5.617437 ;
+        select -r ($hipMesh + ".vtx[12]");move -r 0 93.267784 -5.406258 ;
+        select -r ($hipMesh + ".vtx[13]");move -r -1.603671 93.512604 -4.623964 ;
+        select -r ($hipMesh + ".vtx[14]");move -r 0 89.396507 0 ;
+        select -r ($hipMesh + ".vtx[15]");move -r -1.603671 90.270569 0 ;
+        select -r ($hipMesh + ".vtx[16]");move -r 10.47165 99.876961 0 ;
+        select -r $hipMesh;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1;
+        DeleteHistory;
+
+        string $abMeshA[] = `polyCube -n "Santi_Ab" -w 25 -h 15 -d 25 -sd 4 -sh 2 -sw 4`;
+        move -r -0.004 115.659 1.025 ;
+        string $abMesh = $abMeshA[0];
+        $bodyCentalMeshesArray[size($bodyCentalMeshesArray)] = $abMesh;
+        int $abDelFaces[] = {0, 1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29, 32, 33, 36, 37, 40, 41, 44, 45, 56, 57, 58, 59, 60, 61, 62, 63};
+        select -cl;
+        for ($faces in $abDelFaces){select -add ($abMesh + ".f[" + $faces +"]");}
+        doDelete;
+        select -r ($abMesh + ".vtx[0]");move -r 0.004 -0.384494 0.201874 ;
+        select -r ($abMesh + ".vtx[1]");move -r -3.100138 -0.0349689 0.0466438 ;
+        select -r ($abMesh + ".vtx[2]");move -r -5.085108 1.624752 -1.596569 ;
+        select -r ($abMesh + ".vtx[3]");move -r 0.004 -2.303371 0.840141 ;
+        select -r ($abMesh + ".vtx[4]");move -r -3.727758 -2.071033 0.778237 ;
+        select -r ($abMesh + ".vtx[5]");move -r -6.828309 -1.101909 0.122511 ;
+        select -r ($abMesh + ".vtx[6]");move -r 0.004 -5.639774 0.484748 ;
+        select -r ($abMesh + ".vtx[7]");move -r -4.332853 -5.581256 0.444402 ;
+        select -r ($abMesh + ".vtx[8]");move -r -8.243698 -5.170047 -0.601084 ;
+        select -r ($abMesh + ".vtx[9]");move -r 0.004 -4.672855 2.711159 ;
+        select -r ($abMesh + ".vtx[10]");move -r -3.364562 -4.458934 2.351147 ;
+        select -r ($abMesh + ".vtx[11]");move -r -4.982228 -3.390079 2.941339 ;
+        select -r ($abMesh + ".vtx[12]");move -r 0.004 -4.517955 3.159322 ;
+        select -r ($abMesh + ".vtx[13]");move -r -2.781102 -4.022373 3.434926 ;
+        select -r ($abMesh + ".vtx[14]");move -r -0.136058 0.0580181 3.326335 ;
+        select -r ($abMesh + ".vtx[15]");move -r 0.004 -4.300022 4.676627 ;
+        select -r ($abMesh + ".vtx[16]");move -r -2.542983 -3.856609 5.054835 ;
+        select -r ($abMesh + ".vtx[17]");move -r 0.0868505 -0.446567 3.804411 ;
+        select -r ($abMesh + ".vtx[18]");move -r 0.004 -4.184848 2.198186 ;
+        select -r ($abMesh + ".vtx[19]");move -r -0.539819 -3.742534 3.262184 ;
+        select -r ($abMesh + ".vtx[20]");move -r -3.517825 -2.249614 5.918274 ;
+        select -r ($abMesh + ".vtx[21]");move -r -1.8999e-10 -3.41797e-06 -3.8147e-07 ;
+        select -r ($abMesh + ".vtx[22]");move -r -1.198972 0.584965 1.350196 ;
+        select -r ($abMesh + ".vtx[23]");move -r -3.59901 1.677487 3.983667 ;
+        select -r ($abMesh + ".vtx[24]");move -r 0.004 3.665493 -0.552484 ;
+        select -r ($abMesh + ".vtx[25]");move -r -2.512278 3.908177 -0.0793957 ;
+        select -r ($abMesh + ".vtx[26]");move -r -5.254855 4.589848 2.441814 ;
+        select -r ($abMesh + ".vtx[27]");move -r -1.8999e-10 4.764874 1.848093 ;
+        select -r ($abMesh + ".vtx[28]");move -r -1.517381 4.87576 1.299677 ;
+        select -r ($abMesh + ".vtx[29]");move -r -0.787459 6.257718 1.279201 ;
+        select -r ($abMesh + ".vtx[30]");move -r 0.004 2.676953 4.230608 ;
+        select -r ($abMesh + ".vtx[31]");move -r -1.830232 3.113057 4.050503 ;
+        select -r ($abMesh + ".vtx[32]");move -r -0.657009 5.169339 4.33256 ;
+        select -r ($abMesh + ".vtx[33]");move -r 0.004 -0.254352 4.290275 ;
+        select -r ($abMesh + ".vtx[34]");move -r -3.086085 0.123097 4.115213 ;
+        select -r ($abMesh + ".vtx[35]");move -r -3.043621 3.063214 2.289413 ;
+        select -r ($abMesh + ".vtx[36]");move -r 0.74917 3.399884 2.713915 ;
+        select -r ($abMesh + ".vtx[37]");move -r 0.310039 3.191677 3.882591 ;
+        select -r ($abMesh + ".vtx[38]");move -r -3.756094 0.647587 3.111378 ;
+        select -r $abMesh;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1;
+        DeleteHistory;
+
+        string $chestMeshA[] = `polyCube -n "Santi_Chest" -w 25 -h 30 -d 25 -sd 4 -sh 4 -sw 8`;
+        move -ws -0.006 138.779 0.846 ;
+        string $chestMesh = $chestMeshA[0];
+        $bodyCentalMeshesArray[size($bodyCentalMeshesArray)] = $chestMesh;
+        int $chestDelFaces[] = {0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19, 24, 25, 26, 27, 32, 33, 34, 35, 40, 41, 42, 43, 48, 49, 50, 51, 56, 57, 58, 59, 64, 65, 66, 67, 72, 73, 74, 75, 80, 81, 82, 83, 88, 89, 90, 91, 96, 97, 98, 99, 104, 105, 106, 107, 112, 113, 114, 115, 120, 121, 122, 123, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 };
+        select -cl;
+        for ($faces in $chestDelFaces){select -add ($chestMesh + ".f[" + $faces +"]");}
+        doDelete;
+        select -r ($chestMesh + ".vtx[0]");move -ws -0.006 124.2170207 13.46546011;
+        select -r ($chestMesh + ".vtx[1]");move -ws 3.119 124.2170207 13.46546011;
+        select -r ($chestMesh + ".vtx[2]");move -ws 6.077175659 125.8470761 13.8565505;
+        select -r ($chestMesh + ".vtx[3]");move -ws 8.58441214 127.3067252 14.30761842;
+        select -r ($chestMesh + ".vtx[4]");move -ws 12.88195567 130.457215 13.25621919;
+        select -r ($chestMesh + ".vtx[5]");move -ws -0.005317303358 130.3725898 14.70246725;
+        select -r ($chestMesh + ".vtx[6]");move -ws 2.629759592 130.1017148 14.9732583;
+        select -r ($chestMesh + ".vtx[7]");move -ws 6.035031361 131.2633402 14.42675523;
+        select -r ($chestMesh + ".vtx[8]");move -ws 9.698972267 132.9819486 13.62752752;
+        select -r ($chestMesh + ".vtx[9]");move -ws 14.67359881 135.2810061 11.43184404;
+        select -r ($chestMesh + ".vtx[10]");move -ws -0.006794745109 136.0986898 13.53402738;
+        select -r ($chestMesh + ".vtx[11]");move -ws 2.792535347 136.1163029 14.0243514;
+        select -r ($chestMesh + ".vtx[12]");move -ws 6.231391472 136.6633982 13.61751394;
+        select -r ($chestMesh + ".vtx[13]");move -ws 11.89259009 138.9826965 11.40805463;
+        select -r ($chestMesh + ".vtx[14]");move -ws 15.7067533 138.7588654 9.877065941;
+        select -r ($chestMesh + ".vtx[15]");move -ws -0.006779509544 144.2056119 8.472986027;
+        select -r ($chestMesh + ".vtx[16]");move -ws 3.420750422 144.4205167 8.967910095;
+        select -r ($chestMesh + ".vtx[17]");move -ws 6.700506729 144.7326963 8.48773317;
+        select -r ($chestMesh + ".vtx[18]");move -ws 12.13661723 144.0948951 7.791858955;
+        select -r ($chestMesh + ".vtx[19]");move -ws 16.55240302 144.1434176 7.651679321;
+        select -r ($chestMesh + ".vtx[20]");move -ws -0.00639383542 148.2888333 4.423989578;
+        select -r ($chestMesh + ".vtx[21]");move -ws 3.451906246 148.7472846 3.892719551;
+        select -r ($chestMesh + ".vtx[22]");move -ws 6.652086777 149.7344367 2.174050613;
+        select -r ($chestMesh + ".vtx[23]");move -ws 12.63671832 149.5080154 2.379549309;
+        select -r ($chestMesh + ".vtx[24]");move -ws 20.58030753 148.1070392 3.593699738;
+        select -r ($chestMesh + ".vtx[25]");move -ws -0.006 153.779 -0.2739083328;
+        select -r ($chestMesh + ".vtx[26]");move -ws 3.669433636 153.779 -0.2739083328;
+        select -r ($chestMesh + ".vtx[27]");move -ws 8.121419472 151.3836219 -0.5925418892;
+        select -r ($chestMesh + ".vtx[28]");move -ws 14.67330794 152.015289 -1.665850357;
+        select -r ($chestMesh + ".vtx[29]");move -ws 21.59927802 149.8846871 -0.5196129837;
+        select -r ($chestMesh + ".vtx[30]");move -ws -0.006 155.0073173 -3.388462261;
+        select -r ($chestMesh + ".vtx[31]");move -ws 3.669433636 155.0073173 -3.388462261;
+        select -r ($chestMesh + ".vtx[32]");move -ws 9.210745377 152.4132382 -3.979595379;
+        select -r ($chestMesh + ".vtx[33]");move -ws 14.84846167 152.7270972 -4.611796097;
+        select -r ($chestMesh + ".vtx[34]");move -ws 22.21657233 150.6167752 -5.649475292;
+        select -r ($chestMesh + ".vtx[35]");move -ws -0.006390708447 155.0713183 -5.995610909;
+        select -r ($chestMesh + ".vtx[36]");move -ws 3.596576494 155.3426044 -5.625302986;
+        select -r ($chestMesh +".vtx[37]");move -ws 8.465600533 151.3554837 -7.953900055;
+        select -r ($chestMesh + ".vtx[38]");move -ws 14.09796194 152.0735023 -8.472948746;
+        select -r ($chestMesh + ".vtx[39]");move -ws 20.83659605 150.4520108 -8.965878204;
+        select -r ($chestMesh +".vtx[40]");move -ws -0.009790743649 154.4453427 -7.875717834;
+        select -r ($chestMesh + ".vtx[41]");move -ws 2.740134043 154.3739926 -7.664845184;
+        select -r ($chestMesh + ".vtx[42]");move -ws 6.212043327 150.0899055 -9.936697678;
+        select -r ($chestMesh + ".vtx[43]");move -ws 10.99068026 150.3903806 -10.98316451;
+        select -r ($chestMesh + ".vtx[44]");move -ws 17.83024458 148.0957038 -12.14137621;
+        select -r ($chestMesh + ".vtx[45]");move -ws -0.006125824998 147.5455024 -10.86772414;
+        select -r ($chestMesh + ".vtx[46]");move -ws 2.385692162 147.5642545 -10.95189734;
+        select -r ($chestMesh + ".vtx[47]");move -ws 6.315855068 146.8172299 -12.79822607;
+        select -r ($chestMesh + ".vtx[48]");move -ws 11.31845335 145.4385726 -13.14091082;
+        select -r ($chestMesh + ".vtx[49]");move -ws 15.01489119 143.7768704 -13.08353587;
+        select -r ($chestMesh + ".vtx[50]");move -ws -0.004506593984 133.6032259 -10.98859759;
+        select -r ($chestMesh + ".vtx[51]");move -ws 2.291850609 133.5608518 -11.00309058;
+        select -r ($chestMesh + ".vtx[52]");move -ws 6.099828285 134.2288582 -11.42729254;
+        select -r ($chestMesh + ".vtx[53]");move -ws 9.168227715 134.9362487 -11.30859633;
+        select -r ($chestMesh + ".vtx[54]");move -ws 11.25270323 135.5373687 -11.1529481;
+        select -r ($chestMesh + ".vtx[55]");move -ws -0.007210394315 122.9287269 -10.8277833;
+        select -r ($chestMesh + ".vtx[56]");move -ws 3.570888323 123.1152494 -10.82245703;
+        select -r ($chestMesh + ".vtx[57]");move -ws 6.999604267 124.8911664 -10.31977721;
+        select -r ($chestMesh + ".vtx[58]");move -ws 9.053381485 127.4954307 -9.4754674;
+        select -r ($chestMesh + ".vtx[59]");move -ws 10.69195132 130.5580289 -9.308265404;
+        select -r ($chestMesh + ".vtx[60]");move -ws -0.006374555588 122.2159354 -7.014851288;
+        select -r ($chestMesh + ".vtx[61]");move -ws 3.163177294 122.8094794 -7.014850811;
+        select -r ($chestMesh + ".vtx[62]");move -ws 6.419126076 123.5930326 -6.324984745;
+        select -r ($chestMesh + ".vtx[63]");move -ws 9.678720993 126.2006146 -5.798181252;
+        select -r ($chestMesh + ".vtx[64]");move -ws 11.56899123 128.6561343 -5.441949085;
+        select -r ($chestMesh + ".vtx[65]");move -ws -0.006372471346 125.9991538 -4.092612461;
+        select -r ($chestMesh + ".vtx[66]");move -ws 3.804508013 126.0974204 -3.875137047;
+        select -r ($chestMesh + ".vtx[67]");move -ws 7.7417355 126.945564 -3.507817463;
+        select -r ($chestMesh + ".vtx[68]");move -ws 10.68823485 128.684098 -2.795940355;
+        select -r ($chestMesh + ".vtx[69]");move -ws 12.51347975 129.9436042 -3.94291468;
+        select -r ($chestMesh + ".vtx[70]");move -ws -0.005984229502 127.6957929 -0.05344052696;
+        select -r ($chestMesh + ".vtx[71]");move -ws 3.328354639 127.783981 0.1424510322;
+        select -r ($chestMesh + ".vtx[72]");move -ws 6.986784023 128.7747047 0.08751688814;
+        select -r ($chestMesh + ".vtx[73]");move -ws 11.89797835 131.3122866 0.7082250706;
+        select -r ($chestMesh + ".vtx[74]");move -ws 14.57380061 131.604706 0.5792192659;
+        select -r ($chestMesh + ".vtx[75]");move -ws -0.006 126.7455966 7.096;
+        select -r ($chestMesh + ".vtx[76]");move -ws 3.119 126.7455966 7.096;
+        select -r ($chestMesh + ".vtx[77]");move -ws 6.749980968 128.538757 7.080980583;
+        select -r ($chestMesh + ".vtx[78]");move -ws 11.73367171 131.1641995 7.219355389;
+        select -r ($chestMesh + ".vtx[79]");move -ws 14.26371054 131.7335512 7.658540531;
+        select -r ($chestMesh + ".vtx[80]");move -ws 13.98866324 132.6764981 -4.789878563;
+        select -r ($chestMesh + ".vtx[81]");move -ws 15.9926105 134.7123048 -0.4231162825;
+        select -r ($chestMesh + ".vtx[82]");move -ws 15.49050478 135.1228048 6.76831226;
+        select -r ($chestMesh + ".vtx[83]");move -ws 15.19001822 137.2315434 -6.580294327;
+        select -r ($chestMesh + ".vtx[84]");move -ws 16.97561507 138.5994532 -1.857641891;
+        select -r ($chestMesh + ".vtx[85]");move -ws 16.67653326 139.1644815 5.208010002;
+        select -r ($chestMesh + ".vtx[86]");move -ws 16.06490759 143.5816342 -8.091468529;
+        select -r ($chestMesh + ".vtx[87]");move -ws 17.85777335 144.3216316 -3.493636803;
+        select -r ($chestMesh + ".vtx[88]");move -ws 18.07301001 144.4039237 3.771853968;
+        select -r $chestMesh;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.2 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1;
+        DeleteHistory;
+
+        string $headMeshA[] = `polyCube -n "Santi_Head" -w 15 -h 15 -d 15 -sd 3 -sh 2 -sw 4`;
+        move -r -0 167.535 0.681 ;
+        string $headMesh = $headMeshA[0];
+        $bodyCentalMeshesArray[size($bodyCentalMeshesArray)] = $headMesh;
+        select -r ($headMesh + ".f[0:1]") ($headMesh + ".f[4:5]") ($headMesh + ".f[8:9]") ($headMesh + ".f[12:13]") ($headMesh + ".f[16:17]") ($headMesh + ".f[20:21]") ($headMesh + ".f[24:25]") ($headMesh + ".f[28:29]") ($headMesh + ".f[32:33]") ($headMesh + ".f[36:37]") ($headMesh + ".f[46:51]");
+        doDelete;
+
+        select -r ($headMesh + ".vtx[0]") ;move -r -2.42133e-05 -5.397045 2.579981 ;
+        select -r ($headMesh + ".vtx[1]") ;move -r -0.842781 -4.46069 1.717348 ;
+        select -r ($headMesh + ".vtx[2]") ;move -r -2.303384 -1.823376 -1.872496 ;
+        select -r ($headMesh + ".vtx[3]") ;move -r -2.09808e-05 -3.753994 4.874269 ;
+        select -r ($headMesh + ".vtx[4]") ;move -r -1.894597 -3.63963 4.583753 ;
+        select -r ($headMesh + ".vtx[5]") ;move -r -1.668701 -1.474713 -0.817597 ;
+        select -r ($headMesh + ".vtx[6]") ;move -r -0.000613654 -1.903195 2.996399 ;
+        select -r ($headMesh + ".vtx[7]") ;move -r 0.670056 -1.580364 2.794811 ;
+        select -r ($headMesh + ".vtx[8]") ;move -r -0.178853 -3.027676 -1.391219 ;
+        select -r ($headMesh + ".vtx[9]") ;move -r -0.000502517 4.31673 2.616676 ;
+        select -r ($headMesh + ".vtx[10]") ;move -r 0.0402372 3.920765 2.561808 ;
+        select -r ($headMesh + ".vtx[11]") ;move -r 0.200609 -0.539562 0.350965 ;
+        select -r ($headMesh + ".vtx[12]") ;move -r -1.90735e-06 5.20525 0.0145225 ;
+        select -r ($headMesh + ".vtx[13]") ;move -r -0.860562 5.062427 0.0450294 ;
+        select -r ($headMesh + ".vtx[14]") ;move -r 0.146317 0.689243 -0.245879 ;
+        select -r ($headMesh + ".vtx[15]") ;move -r 6.27624e-07 1.79813 -1.145447 ;
+        select -r ($headMesh + ".vtx[16]") ;move -r -0.203888 0.942264 -0.694331 ;
+        select -r ($headMesh + ".vtx[17]") ;move -r 0.0225053 -1.601788 0.486233 ;
+        select -r ($headMesh + ".vtx[18]") ;move -r -1.63012e-06 0.485172 -4.873806 ;
+        select -r ($headMesh + ".vtx[19]") ;move -r -0.212333 0.445484 -4.076969 ;
+        select -r ($headMesh + ".vtx[20]") ;move -r 0.0132895 0.256885 -1.500513 ;
+        select -r ($headMesh + ".vtx[21]") ;move -r -7.93912e-06 0.24979 -1.823838 ;
+        select -r ($headMesh + ".vtx[22]") ;move -r -0.779846 0.560566 -1.488364 ;
+        select -r ($headMesh + ".vtx[23]") ;move -r -0.398668 1.591312 1.509628 ;
+        select -r ($headMesh + ".vtx[24]") ;move -r -1.50204e-05 -2.866772 1.146332 ;
+        select -r ($headMesh + ".vtx[25]") ;move -r 0.0774543 -2.325482 0.95088 ;
+        select -r ($headMesh + ".vtx[26]") ;move -r -0.424661 -0.0607568 -0.0852783 ;
+        select -r ($headMesh + ".vtx[27]") ;move -r -1.81198e-05 -3.735699 -0.0309765 ;
+        select -r ($headMesh + ".vtx[28]") ;move -r -0.137027 -3.178753 0.482273 ;
+        select -r ($headMesh + ".vtx[29]") ;move -r -0.536499 0.28368 0.54548 ;
+        select -r ($headMesh + ".vtx[30]") ;move -r -7.15256e-06 0.000430908 -0.000218159 ;
+        select -r ($headMesh + ".vtx[31]") ;move -r -7.15256e-06 0.000430908 -0.000218159 ;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.01 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1 $headMesh;
+
+        //LEFT BODY MODEL MESHES INIT
+        string $bodyMeshArray[] = {}; 
+
+        string $armMeshA[] = `polyCylinder -n "Santi_Arm" -r 6 -h 27 -sx 6 -sy 4 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1`;
+        move -r 31.734 143.175 -5.697 ;
+        rotate -r -os -fo -3.04688 0 -87.610028 ;
+        string $armMesh = $armMeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $armMesh;
+        select -r ($armMesh + ".vtx[0]") ;move -ws 17.30277297 141.4168549 -11.58087222;
+        select -r ($armMesh + ".vtx[1]") ;move -ws 20.86707243 148.0655159 -11.08939583;
+        select -r ($armMesh + ".vtx[2]") ;move -ws 22.23624252 148.3293299 -4.421992245;
+        select -r ($armMesh + ".vtx[3]") ;move -ws 20.48794194 143.9165648 0.180163235;
+        select -r ($armMesh + ".vtx[4]") ;move -ws 18.58573889 138.2788799 -2.643138642;
+        select -r ($armMesh + ".vtx[5]") ;move -ws 17.48611092 137.8640744 -8.387453033;
+        select -r ($armMesh + ".vtx[6]") ;move -r 0.1406 1.101167 -2.091619 ;
+        select -r ($armMesh + ".vtx[7]") ;move -r 1.692071 2.764421 -0.617023 ;
+        select -r ($armMesh + ".vtx[8]") ;move -r 1.71749 0.91103 0.239902 ;
+        select -r ($armMesh + ".vtx[9]") ;move -r 1.15867 -0.302103 0.830507 ;
+        select -r ($armMesh + ".vtx[10]") ;move -r 0.52377 -0.196024 0.339292 ;
+        select -r ($armMesh + ".vtx[11]") ;move -r 0.719445 0.505923 -2.101504 ;
+        select -r ($armMesh + ".vtx[12]") ;move -r -0.997029 1.354707 -0.445189 ;
+        select -r ($armMesh + ".vtx[13]") ;move -r -0.653759 0.897462 0.274735 ;
+        select -r ($armMesh + ".vtx[14]") ;move -r -0.853134 -0.136059 0.0320944 ;
+        select -r ($armMesh + ".vtx[15]") ;move -r -1.029788 -1.383661 -0.61704 ;
+        select -r ($armMesh + ".vtx[16]") ;move -r -0.720009 0.973989 -1.682989 ;
+        select -r ($armMesh + ".vtx[17]") ;move -r -0.837083 1.894442 -1.661188 ;
+        select -r ($armMesh + ".vtx[18]") ;move -r -0.287812 1.73845 0.492964 ;
+        select -r ($armMesh + ".vtx[19]") ;move -r -0.125681 -0.18962 0.74128 ;
+        select -r ($armMesh + ".vtx[20]") ;move -r -0.428656 -1.308667 0.871036 ;
+        select -r ($armMesh + ".vtx[21]") ;move -r -0.247667 -0.856135 -0.935439 ;
+        select -r ($armMesh + ".vtx[22]") ;move -r -0.67202 0.400274 -1.92336 ;
+        select -r ($armMesh + ".vtx[23]") ;move -r -0.74369 1.834612 -1.17091 ;
+        select -r ($armMesh + ".vtx[24]") ;move -r -1.186 0.588761 0.22296 ;
+        select -r ($armMesh + ".vtx[25]") ;move -r 0.0816527 0.523438 0.208377 ;
+        select -r ($armMesh + ".vtx[26]") ;move -r -2.113694 -0.609906 1.261598 ;
+        select -r ($armMesh + ".vtx[27]") ;move -r -1.390198 0.352895 0.241164 ;
+        select -r ($armMesh + ".vtx[28]") ;move -r -0.858641 0.313985 -1.122813 ;
+        select -r ($armMesh + ".vtx[29]") ;move -r -2.007777 0.840929 -0.656234 ;
+        select -r ($armMesh + ".vtx[30]") ;move -r 2.891131 0.155369 -0.0198678 ;
+        select -r ($armMesh + ".vtx[31]") ;move -r -1.18222 1.054461 0.11237 ;
+
+        string $forearmMeshA[] = `polyCylinder -n "Santi_Forearm" -r 6 -h 27 -sx 6 -sy 4 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1`;
+        move -r 60.262 143.511 -6.266 ;
+        rotate -r -os -fo 0 0 90 ;
+        string $forearmMesh = $forearmMeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $forearmMesh;
+
+        select -r ($forearmMesh + ".vtx[0]") ;move -r -1.835433 -0.927765 1.998845 ;
+        select -r ($forearmMesh + ".vtx[1]") ;move -r -1.190123 0.789323 1.623098 ;
+        select -r ($forearmMesh + ".vtx[2]") ;move -r -2.007476 2.896639 0.820788 ;
+        select -r ($forearmMesh + ".vtx[3]") ;move -r -1.065589 0.636446 -2.138963 ;
+        select -r ($forearmMesh + ".vtx[4]") ;move -r -1.336417 -1.101454 -1.928488 ;
+        select -r ($forearmMesh + ".vtx[5]") ;move -r -1.96971 -2.593672 0.0700824 ;
+        select -r ($forearmMesh + ".vtx[6]") ;move -r 0.938638 -0.502746 2.208142 ;
+        select -r ($forearmMesh + ".vtx[7]") ;move -r 0.98581 1.621812 1.220134 ;
+        select -r ($forearmMesh + ".vtx[8]") ;move -r 0.802362 3.316072 -0.0615524 ;
+        select -r ($forearmMesh + ".vtx[9]") ;move -r 0.942399 1.523425 -1.290816 ;
+        select -r ($forearmMesh + ".vtx[10]") ;move -r 1.353906 -1.731154 -0.975336 ;
+        select -r ($forearmMesh + ".vtx[11]") ;move -r 1.20395 -1.944853 0.663821 ;
+        select -r ($forearmMesh + ".vtx[12]") ;move -r 1.538762 -1.045578 2.596987 ;
+        select -r ($forearmMesh + ".vtx[13]") ;move -r 1.333833 2.60489 1.380096 ;
+        select -r ($forearmMesh + ".vtx[14]") ;move -r 1.235272 3.7502 -0.714414 ;
+        select -r ($forearmMesh + ".vtx[15]") ;move -r 0.938756 2.23543 -2.140025 ;
+        select -r ($forearmMesh + ".vtx[16]") ;move -r 1.238095 -1.558394 -1.977433 ;
+        select -r ($forearmMesh + ".vtx[17]") ;move -r 1.955434 -2.158125 -0.316852 ;
+        select -r ($forearmMesh + ".vtx[18]") ;move -r 1.763238 0.11641 1.163566 ;
+        select -r ($forearmMesh + ".vtx[19]") ;move -r 1.685224 2.241074 -0.429921 ;
+        select -r ($forearmMesh + ".vtx[20]") ;move -r 1.353578 1.465242 -0.266451 ;
+        select -r ($forearmMesh + ".vtx[21]") ;move -r 1.745282 2.335864 -0.424828 ;
+        select -r ($forearmMesh + ".vtx[22]") ;move -r 1.271283 0.521181 -0.602719 ;
+        select -r ($forearmMesh + ".vtx[23]") ;move -r 1.196096 -0.777678 -0.0994337 ;
+        select -r ($forearmMesh + ".vtx[24]") ;move -r 2.037156 -0.198868 1.852778 ;
+        select -r ($forearmMesh + ".vtx[25]") ;move -r 0.475576 0.907212 1.136599 ;
+        select -r ($forearmMesh + ".vtx[26]") ;move -r 0.213613 1.227831 -0.848528 ;
+        select -r ($forearmMesh + ".vtx[27]") ;move -r 2.085996 1.581164 -0.0184304 ;
+        select -r ($forearmMesh + ".vtx[28]") ;move -r 0.873551 0.397798 0.641089 ;
+        select -r ($forearmMesh + ".vtx[29]") ;move -r 0.914975 -1.286162 1.15689 ;
+        select -r ($forearmMesh + ".vtx[30]") ;move -r -0.679778 -0.35298 0.0263397 ;
+        select -r ($forearmMesh + ".vtx[31]") ;move -r 1.063066 0.0897843 -0.184078 ;
+
+        string $handMeshA[] = `polyCube -n "Santi_Hand" -w 8 -h 8 -d 8 -sd 2 -sh 2 -sw 2`;
+        move -r 79.935 143.022 -6.491 ;
+        string $handMesh = $handMeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $handMesh;
+
+        select -r ($handMesh + ".vtx[0]") ;move -r 2.833176 1.15506 -0.479265 ;
+        select -r ($handMesh + ".vtx[1]") ;move -r 1.804474 2.312744 0.0433497 ;
+        select -r ($handMesh + ".vtx[2]") ;move -r 0.601967 2.337997 -0.785156 ;
+        select -r ($handMesh + ".vtx[3]") ;move -r 3.438726 -0.524731 0.46463 ;
+        select -r ($handMesh + ".vtx[4]") ;move -r 2.028343 -0.318848 0.736417 ;
+        select -r ($handMesh + ".vtx[5]") ;move -r 1.575233 -0.154343 0.0958574 ;
+        select -r ($handMesh + ".vtx[6]") ;move -r 2.93472 -2.970288 0.457826 ;
+        select -r ($handMesh + ".vtx[7]") ;move -r 1.800064 -2.65007 0.658522 ;
+        select -r ($handMesh + ".vtx[8]") ;move -r 0.89817 -2.184555 -0.098676 ;
+        select -r ($handMesh + ".vtx[9]") ;move -r 0.154396 -1.263107 2.052011 ;
+        select -r ($handMesh + ".vtx[10]") ;move -r -0.994858 -0.244064 0.243436 ;
+        select -r ($handMesh + ".vtx[11]") ;move -r 0.722824 -1.329178 -0.821742 ;
+        select -r ($handMesh + ".vtx[12]") ;move -r -1.307793 -2.036102 1.654261 ;
+        select -r ($handMesh + ".vtx[13]") ;move -r -1.828293 -1.220276 0.393429 ;
+        select -r ($handMesh + ".vtx[14]") ;move -r -0.278564 -1.599243 0.250938 ;
+        select -r ($handMesh + ".vtx[15]") ;move -r -1.234459 0.0907593 1.025227 ;
+        select -r ($handMesh + ".vtx[16]") ;move -r -1.536758 1.130783 -0.243772 ;
+        select -r ($handMesh + ".vtx[17]") ;move -r -0.462669 1.321869 -0.576918 ;
+        select -r ($handMesh + ".vtx[18]") ;move -r -0.271149 2.299072 1.620728 ;    
+        select -r ($handMesh + ".vtx[19]") ;move -r -1.206306 3.094727 0.297752 ;
+        select -r ($handMesh + ".vtx[20]") ;move -r -0.421616 3.47171 -0.154592 ;
+        select -r ($handMesh + ".vtx[21]") ;move -r 0.224678 0.263153 0.793019 ;
+        select -r ($handMesh + ".vtx[22]") ;move -r -0.446617 1.350281 0.174304 ;
+        select -r ($handMesh + ".vtx[23]") ;move -r 0.240402 2.513153 -1.170508 ;
+        select -r ($handMesh + ".vtx[24]") ;move -r 1.553352 0.547409 -1.156707 ;
+        select -r ($handMesh + ".vtx[25]") ;move -r 0.276733 -0.517258 1.203917 ;
+
+        //DEDOS DE LA MANO INIT
+        string $thumb1MeshA[] = `polyCube -n "Santi_Thumb_1" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -rpr 79.015 140.393 -2.131;
+        string $thumb1Mesh = $thumb1MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $thumb1Mesh;
+
+        select -r ($thumb1Mesh + ".vtx[0]") ;move -r -1.755188 -0.470184 -0.324527 ;
+        select -r ($thumb1Mesh + ".vtx[1]") ;move -r -1.108147 -0.820307 0.084029 ;
+        select -r ($thumb1Mesh + ".vtx[2]") ;move -r 0.195763 -1.558395 0.723674 ;
+        select -r ($thumb1Mesh + ".vtx[3]") ;move -r -1.663498 0.523743 0.666161 ;
+        select -r ($thumb1Mesh + ".vtx[4]") ;move -r -1.004746 0.0933281 1.138992 ;
+        select -r ($thumb1Mesh + ".vtx[5]") ;move -r 0.65802 -0.776901 1.540973 ;
+        select -r ($thumb1Mesh + ".vtx[6]") ;move -r -0.986534 1.06517 1.001277 ;
+        select -r ($thumb1Mesh + ".vtx[7]") ;move -r -0.473015 0.575964 1.195143 ;
+        select -r ($thumb1Mesh + ".vtx[8]") ;move -r 0.771553 -0.221481 1.556199 ;
+        select -r ($thumb1Mesh + ".vtx[9]") ;move -r -0.396782 1.565048 0.518885 ;
+        select -r ($thumb1Mesh + ".vtx[10]") ;move -r 0.231049 1.489807 0.31014 ;
+        select -r ($thumb1Mesh + ".vtx[11]") ;move -r 1.280289 0.298416 0.81565 ;
+        select -r ($thumb1Mesh + ".vtx[12]") ;move -r -0.0591583 1.27713 -0.377687 ;
+        select -r ($thumb1Mesh + ".vtx[13]") ;move -r 0.499123 1.118607 -0.376115 ;
+        select -r ($thumb1Mesh + ".vtx[14]") ;move -r 1.673378 0.0345001 0.519351 ;
+        select -r ($thumb1Mesh + ".vtx[15]") ;move -r -0.383507 0.974548 -1.089707 ;    
+        select -r ($thumb1Mesh + ".vtx[16]") ;move -r 0.449944 0.813431 -1.006207 ;
+        select -r ($thumb1Mesh + ".vtx[17]") ;move -r 1.584587 -0.285721 0.242046 ;
+        select -r ($thumb1Mesh + ".vtx[18]") ;move -r -0.699219 -0.111542 -1.613267 ;
+        select -r ($thumb1Mesh + ".vtx[19]") ;move -r -0.0254974 -0.382492 -1.30333 ;
+        select -r ($thumb1Mesh + ".vtx[20]") ;move -r 0.910835 -0.824036 -0.150869 ;
+        select -r ($thumb1Mesh + ".vtx[21]") ;move -r -1.366982 -0.386749 -1.336669 ;
+        select -r ($thumb1Mesh + ".vtx[22]") ;move -r -0.670929 -1.01033 -0.936171 ;
+        select -r ($thumb1Mesh + ".vtx[23]") ;move -r 0.810501 -1.365601 0.0271156 ;
+        select -r ($thumb1Mesh + ".vtx[24]") ;move -r 1.763695 -0.63681 0.819758 ;
+        select -r ($thumb1Mesh + ".vtx[25]") ;move -r -1.529236 0.853317 -0.0295739 ;
+
+        string $thumb2MeshA[] = `polyCube -n "Santi_Thumb_2" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -rpr 83.153 138.35 0.003;
+        string $thumb2Mesh = $thumb2MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $thumb2Mesh;
+
+        select -r ($thumb2Mesh + ".vtx[0]") ;move -r -1.421173 -0.201141 -1.11359 ;
+        select -r ($thumb2Mesh + ".vtx[1]") ;move -r -0.595261 -0.713333 -0.556896 ;
+        select -r ($thumb2Mesh + ".vtx[2]") ;move -r -0.0434875 -1.328613 0.40264 ;
+        select -r ($thumb2Mesh + ".vtx[3]") ;move -r -1.496094 0.591644 -0.223741 ;
+        select -r ($thumb2Mesh + ".vtx[4]") ;move -r -0.743866 -0.136322 0.327529 ;
+        select -r ($thumb2Mesh + ".vtx[5]") ;move -r 0.402611 -0.889038 1.112618 ;
+        select -r ($thumb2Mesh + ".vtx[6]") ;move -r -0.946617 1.145126 -0.248298 ;
+        select -r ($thumb2Mesh + ".vtx[7]") ;move -r -0.082016 0.184769 0.289421 ;
+        select -r ($thumb2Mesh + ".vtx[8]") ;move -r 0.393929 -0.436005 1.157174 ;
+        select -r ($thumb2Mesh + ".vtx[9]") ;move -r -0.234489 1.438141 -0.626914 ;
+        select -r ($thumb2Mesh + ".vtx[10]") ;move -r 0.558205 0.399033 0.2385 ;
+        select -r ($thumb2Mesh + ".vtx[11]") ;move -r 1.236923 -0.313843 1.014902 ;
+        select -r ($thumb2Mesh + ".vtx[12]") ;move -r 0.377525 0.978745 -0.621952 ;
+        select -r ($thumb2Mesh + ".vtx[13]") ;move -r 0.968597 0.220795 0.0118559 ;
+        select -r ($thumb2Mesh + ".vtx[14]") ;move -r 1.489662 -0.352921 0.954169 ;
+        select -r ($thumb2Mesh + ".vtx[15]") ;move -r 0.103416 0.855133 -1.034869 ;
+        select -r ($thumb2Mesh + ".vtx[16]") ;move -r 0.918091 0.10582 -0.50113 ;
+        select -r ($thumb2Mesh + ".vtx[17]") ; move -r 1.470497 -0.849869 0.803966 ;   
+        select -r ($thumb2Mesh + ".vtx[18]") ;move -r -0.468475 0.0424347 -1.146948 ;
+        select -r ($thumb2Mesh + ".vtx[19]") ;move -r 0.0551987 -0.62236 -0.370411 ;
+        select -r ($thumb2Mesh + ".vtx[20]") ;move -r 0.624367 -1.306747 0.393017 ;
+        select -r ($thumb2Mesh + ".vtx[21]") ;move -r -0.890213 -0.096283 -1.427438 ;
+        select -r ($thumb2Mesh + ".vtx[22]") ;move -r -0.190559 -0.750702 -0.624808 ;
+        select -r ($thumb2Mesh + ".vtx[23]") ;move -r 0.476303 -1.469162 0.248706 ;
+        select -r ($thumb2Mesh + ".vtx[24]") ;move -r 1.253181 -0.969315 0.918773 ;
+        select -r ($thumb2Mesh + ".vtx[25]") ;move -r -0.912178 1.193604 -1.147891 ;
+
+        string $thumb3MeshA[] = `polyCube -n "Santi_Thumb_3" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -rpr 86.094 136.409 1.538;
+        string $thumb3Mesh = $thumb3MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $thumb3Mesh;
+
+        select -r ($thumb3Mesh + ".vtx[0]") ;move -r -0.9366 0.129379 -0.484959 ;
+        select -r ($thumb3Mesh + ".vtx[1]") ;move -r -0.652885 -0.56633 -0.218403 ;
+        select -r ($thumb3Mesh + ".vtx[2]") ;move -r 0.0346527 -0.858704 0.371919 ;
+        select -r ($thumb3Mesh + ".vtx[3]") ;move -r -0.765036 0.794064 -0.293778 ;
+        select -r ($thumb3Mesh + ".vtx[4]") ;move -r -0.223724 -0.043457 0.296982 ;
+        select -r ($thumb3Mesh + ".vtx[5]") ;move -r 0.439392 -0.6521 0.745009 ;
+        select -r ($thumb3Mesh + ".vtx[6]") ;move -r -0.13855 0.790817 -0.171522 ;
+        select -r ($thumb3Mesh + ".vtx[7]") ;move -r 0.375648 0.395905 0.138297 ;
+        select -r ($thumb3Mesh + ".vtx[8]") ;move -r 0.723694 -0.570312 0.656584 ;
+        select -r ($thumb3Mesh + ".vtx[9]") ;move -r 0.180389 0.88942 -0.371359 ;
+        select -r ($thumb3Mesh + ".vtx[10]") ;move -r 0.631035 0.536163 0.120411 ;
+        select -r ($thumb3Mesh + ".vtx[11]") ;move -r 0.948433 -0.485626 0.672795 ;
+        select -r ($thumb3Mesh + ".vtx[12]") ;move -r 0.475853 0.665405 -0.363469 ;
+        select -r ($thumb3Mesh + ".vtx[13]") ;move -r 0.680733 0.255341 0.0475432 ;
+        select -r ($thumb3Mesh + ".vtx[14]") ;move -r 0.960182 -0.473434 0.887942 ;
+        select -r ($thumb3Mesh + ".vtx[15]") ;move -r 0.157288 0.647263 -0.680838 ;
+        select -r ($thumb3Mesh + ".vtx[16]") ;move -r 0.437813 0.146545 -0.363244 ;
+        select -r ($thumb3Mesh + ".vtx[17]") ;move -r 0.838142 -0.486633 0.581 ;
+        select -r ($thumb3Mesh + ".vtx[18]") ;move -r -0.229324 0.106201 -0.683936 ;
+        select -r ($thumb3Mesh + ".vtx[19]") ;move -r -0.106567 -0.325027 -0.344571 ;
+        select -r ($thumb3Mesh + ".vtx[20]") ;move -r 0.341927 -0.665924 0.413009 ;
+        select -r ($thumb3Mesh + ".vtx[21]") ;move -r -0.652802 0.0513458 -0.765253 ;
+        select -r ($thumb3Mesh + ".vtx[22]") ;move -r -0.452911 -0.608597 -0.368172 ;
+        select -r ($thumb3Mesh + ".vtx[23]") ;move -r 0.259827 -0.858475 0.357476 ;
+        select -r ($thumb3Mesh + ".vtx[24]") ;move -r 0.952034 -0.694382 0.714414 ;
+        select -r ($thumb3Mesh + ".vtx[25]") ;move -r -0.448149 0.86253 -0.737396 ;
+
+        string $index1MeshA[] = `polyCube -n "Santi_Index_1" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -3.301;
+        string $index1Mesh = $index1MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $index1Mesh;
+        select -r ($index1Mesh + ".vtx[0]");move -ws 86.59396493 142.1175384 -2.549309016;
+        select -r ($index1Mesh + ".vtx[1]");move -ws 87.99162292 142.1812744 -2.761651517;
+        select -r ($index1Mesh + ".vtx[2]");move -ws 89.33999574 142.2894745 -2.727196694;
+        select -r ($index1Mesh + ".vtx[3]");move -ws 86.37921595 143.1724243 -2.013326169;
+        select -r ($index1Mesh + ".vtx[4]");move -ws 87.93992614 143.1580048 -2.141596318;
+        select -r ($index1Mesh + ".vtx[5]");move -ws 89.48875105 143.1627197 -2.214921475;
+        select -r ($index1Mesh + ".vtx[6]");move -ws 86.5216614 144.1462555 -2.118982793;
+        select -r ($index1Mesh + ".vtx[7]");move -ws 87.9760437 144.0649719 -2.375278951;
+        select -r ($index1Mesh + ".vtx[8]");move -ws 89.34698879 144.1077118 -2.305096627;
+        select -r ($index1Mesh + ".vtx[9]");move -ws 86.48356449 144.5880432 -3.13934374;
+        select -r ($index1Mesh + ".vtx[10]");move -ws 88.0779419 144.5221558 -3.174686433;
+        select -r ($index1Mesh + ".vtx[11]");move -ws 89.52792656 144.5515747 -3.141345502;
+        select -r ($index1Mesh + ".vtx[12]");move -ws 86.63459098 144.617218 -4.238468648;
+        select -r ($index1Mesh + ".vtx[13]");move -ws 88.11395264 144.4594116 -4.070538522;
+        select -r ($index1Mesh + ".vtx[14]");move -ws 89.4081918 144.4671173 -4.074229241;
+        select -r ($index1Mesh + ".vtx[15]");move -ws 86.51419532 143.6554871 -4.550076962;
+        select -r ($index1Mesh + ".vtx[16]");move -ws 88.16233825 143.6043396 -4.542233945;
+        select -r ($index1Mesh + ".vtx[17]");move -ws 89.61525631 143.5436706 -4.441678048;
+        select -r ($index1Mesh + ".vtx[18]");move -ws 86.72081101 142.5706329 -4.561289788;
+        select -r ($index1Mesh + ".vtx[19]");move -ws 88.14648438 142.5599518 -4.461914063;
+        select -r ($index1Mesh + ".vtx[20]");move -ws 89.49523103 142.6223755 -4.348786355;
+        select -r ($index1Mesh + ".vtx[21]");move -ws 86.58336234 142.1022034 -3.713338853;
+        select -r ($index1Mesh + ".vtx[22]");move -ws 88.09925842 141.9780579 -3.773414613;
+        select -r ($index1Mesh + ".vtx[23]");move -ws 89.53837406 142.2601929 -3.589505197;
+        select -r ($index1Mesh + ".vtx[24]");move -ws 89.89779377 143.3718414 -3.292503834;
+        select -r ($index1Mesh + ".vtx[25]");move -ws 86.23369229 143.4157105 -3.29484129;
+
+        string $index2MeshA[] = `polyCube -n "Santi_Index_2" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -rpr 91.663 143.271 -3.376;
+        string $index2Mesh = $index2MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $index2Mesh;
+        select -r ($index2Mesh + ".vtx[0]"); move -ws 90.48097993 142.5789643 -2.694383574;
+        select -r ($index2Mesh + ".vtx[1]"); move -ws 91.34687043 142.5311889 -2.666863454;
+        select -r ($index2Mesh + ".vtx[2]"); move -ws 92.61734773 142.519989 -2.751376105;
+        select -r ($index2Mesh + ".vtx[3]"); move -ws 90.47097672 143.2762527 -2.506295992;
+        select -r ($index2Mesh + ".vtx[4]"); move -ws 91.3494568 143.1566925 -2.388449205;
+        select -r ($index2Mesh + ".vtx[5]"); move -ws 92.64844514 143.1985168 -2.392798675;
+        select -r ($index2Mesh + ".vtx[6]"); move -ws 90.6806717 143.9008026 -2.425845159;
+        select -r ($index2Mesh + ".vtx[7]"); move -ws 91.4629898 143.8261872 -2.499134613;
+        select -r ($index2Mesh + ".vtx[8]"); move -ws 92.43574525 143.8559417 -2.457484497;
+        select -r ($index2Mesh + ".vtx[9]"); move -ws 90.66392518 144.3082428 -3.359347595;
+        select -r ($index2Mesh + ".vtx[10]"); move -ws 91.50120544 144.2692566 -3.411317346;
+        select -r ($index2Mesh + ".vtx[11]"); move -ws 92.76490022 144.1775055 -3.473657844;
+        select -r ($index2Mesh + ".vtx[12]"); move -ws 90.64141084 144.1276245 -3.973770572;
+        select -r ($index2Mesh + ".vtx[13]"); move -ws 91.52229309 144.0910644 -3.955702318;
+        select -r ($index2Mesh + ".vtx[14]"); move -ws 92.51910402 143.9718933 -4.144764436;
+        select -r ($index2Mesh + ".vtx[15]"); move -ws 90.40350164 143.3757348 -4.317961884;
+        select -r ($index2Mesh + ".vtx[16]"); move -ws 91.50379181 143.3526384 -4.378009869;
+        select -r ($index2Mesh + ".vtx[17]"); move -ws 92.65187074 143.5115509 -4.295256628;
+        select -r ($index2Mesh + ".vtx[18]"); move -ws 90.4475403 142.4897308 -4.117527498;
+        select -r ($index2Mesh + ".vtx[19]"); move -ws 91.4786148 142.5215606 -4.31669618;
+        select -r ($index2Mesh + ".vtx[20]"); move -ws 92.60359193 142.5611877 -4.272240175;
+        select -r ($index2Mesh + ".vtx[21]"); move -ws 90.6105652 142.2002105 -3.389970302;
+        select -r ($index2Mesh + ".vtx[22]"); move -ws 91.39663698 142.1544494 -3.514336822;
+        select -r ($index2Mesh + ".vtx[23]"); move -ws 92.69219972 142.2913513 -3.433571817;
+        select -r ($index2Mesh + ".vtx[24]"); move -ws 93.04135133 143.4005432 -3.496272726;
+        select -r ($index2Mesh + ".vtx[25]"); move -ws 90.23990895 143.2980557 -3.345834147;
+
+        string $index3MeshA[] = `polyCube -n "Santi_Index_3" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        string $index3Mesh = $index3MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $index3Mesh;
+        select -r ($index3Mesh + ".vtx[0]") ;move -ws 94.28288269 142.5391846 -2.730042219;
+        select -r ($index3Mesh + ".vtx[1]") ;move -ws 95.2105484 142.6660614 -2.688387871;
+        select -r ($index3Mesh + ".vtx[2]") ;move -ws 96.29838562 142.9943695 -2.932943344;
+        select -r ($index3Mesh + ".vtx[3]") ;move -ws 94.06417084 142.8830872 -2.538682699;
+        select -r ($index3Mesh + ".vtx[4]") ;move -ws 95.13832855 142.9569702 -2.504704475;
+        select -r ($index3Mesh + ".vtx[5]") ;move -ws 96.31316376 143.2273865 -2.79801631;
+        select -r ($index3Mesh + ".vtx[6]") ;move -ws 93.96630096 143.7077637 -2.410036325;
+        select -r ($index3Mesh + ".vtx[7]") ;move -ws 95.0171051 143.6063385 -2.346273422;
+        select -r ($index3Mesh + ".vtx[8]") ;move -ws 96.21614838 143.7603149 -2.655146599;
+        select -r ($index3Mesh + ".vtx[9]") ;move -ws 93.63924408 144.0256348 -3.193738937;
+        select -r ($index3Mesh + ".vtx[10]") ;move -ws 94.97127533 144.1159363 -3.247022152;
+        select -r ($index3Mesh + ".vtx[11]") ;move -ws 96.50646973 144.0002441 -3.405504942;
+        select -r ($index3Mesh + ".vtx[12]") ;move -ws 94.11231232 144.1013794 -4.221235275;
+        select -r ($index3Mesh + ".vtx[13]") ;move -ws 95.03575134 143.9393616 -4.175814152;
+        select -r ($index3Mesh + ".vtx[14]") ;move -ws 96.18161774 143.9209747 -3.988542318;
+        select -r ($index3Mesh + ".vtx[15]") ;move -ws 94.18547821 143.2321472 -4.416549206;
+        select -r ($index3Mesh + ".vtx[16]") ;move -ws 95.06393433 143.3023682 -4.371993542;
+        select -r ($index3Mesh + ".vtx[17]") ;move -ws 96.31143188 143.3811951 -4.045351028;
+        select -r ($index3Mesh + ".vtx[18]") ;move -ws 94.31473541 142.8426666 -4.387649536;
+        select -r ($index3Mesh + ".vtx[19]") ;move -ws 95.31390381 142.7020416 -4.268923759;
+        select -r ($index3Mesh + ".vtx[20]") ;move -ws 96.24474335 142.993927 -4.040169716;
+        select -r ($index3Mesh + ".vtx[21]") ;move -ws 93.99410248 142.5597687 -3.37290144;
+        select -r ($index3Mesh + ".vtx[22]") ;move -ws 95.29845428 142.3489075 -3.46160841;
+        select -r ($index3Mesh + ".vtx[23]") ;move -ws 96.34840393 142.8676758 -3.416404724;
+        select -r ($index3Mesh + ".vtx[24]") ;move -ws 96.58478546 143.3723907 -3.511303425;
+        select -r ($index3Mesh + ".vtx[25]") ;move -ws 93.69512939 142.9833679 -3.30106163;
+
+        string $middle1MeshA[] = `polyCube -n "Santi_Middle_1" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $middle1Mesh = $middle1MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $middle1Mesh;
+        select -r ($middle1Mesh + ".vtx[0]") ;move -ws 87.02307129 142.507431 -5.392158967;
+        select -r ($middle1Mesh + ".vtx[1]") ;move -ws 88.32061767 142.450882 -5.623635334;
+        select -r ($middle1Mesh + ".vtx[2]") ;move -ws 89.54521954 142.377594 -5.844411832;
+        select -r ($middle1Mesh + ".vtx[3]") ;move -ws 86.89445495 143.5356445 -4.868929428;
+        select -r ($middle1Mesh + ".vtx[4]") ;move -ws 88.36921692 143.3871307 -5.023751777;
+        select -r ($middle1Mesh + ".vtx[5]") ;move -ws 90.01064527 143.2785492 -5.364783686;
+        select -r ($middle1Mesh + ".vtx[6]") ;move -ws 87.1315155 144.4541779 -4.970721286;
+        select -r ($middle1Mesh + ".vtx[7]") ;move -ws 88.47862243 144.2532043 -5.246227783;
+        select -r ($middle1Mesh + ".vtx[8]") ;move -ws 89.97334993 144.1137695 -5.227480453;
+        select -r ($middle1Mesh + ".vtx[9]") ;move -ws 87.10868072 144.8858032 -5.948938381;
+        select -r ($middle1Mesh + ".vtx[10]") ;move -ws 88.60019684 144.685791 -6.015039485;
+        select -r ($middle1Mesh + ".vtx[11]") ;move -ws 90.16490161 144.3856811 -6.011593354;
+        select -r ($middle1Mesh + ".vtx[12]") ;move -ws 87.25227356 144.9042664 -7.008465272;
+        select -r ($middle1Mesh + ".vtx[13]") ;move -ws 88.61120605 144.6269989 -6.876787644;
+        select -r ($middle1Mesh + ".vtx[14]") ;move -ws 90.02571583 144.413147 -6.874445957;
+        select -r ($middle1Mesh + ".vtx[15]") ;move -ws 87.03172302 143.9972229 -7.308094066;
+        select -r ($middle1Mesh + ".vtx[16]") ;move -ws 88.57307434 143.8067017 -7.333669227;
+        select -r ($middle1Mesh + ".vtx[17]") ;move -ws 90.11336171 143.5560913 -7.034789067;
+        select -r ($middle1Mesh + ".vtx[18]") ;move -ws 87.1594544 142.9385529 -7.326978248;
+        select -r ($middle1Mesh + ".vtx[19]") ;move -ws 88.46794891 142.808136 -7.259397548;
+        select -r ($middle1Mesh + ".vtx[20]") ;move -ws 89.645944 142.7648315 -7.174365085;
+        select -r ($middle1Mesh + ".vtx[21]") ;move -ws 86.98695373 142.4995727 -6.510472354;
+        select -r ($middle1Mesh + ".vtx[22]") ;move -ws 88.38552093 142.2519226 -6.598659035;
+        select -r ($middle1Mesh + ".vtx[23]") ;move -ws 89.68808174 142.4082642 -6.447332379;
+        select -r ($middle1Mesh + ".vtx[24]") ;move -ws 90.2390815 143.4193573 -6.170479771;
+        select -r ($middle1Mesh + ".vtx[25]") ;move -ws 86.73299408 143.7892456 -6.096228134;
+
+        string $middle2MeshA[] = `polyCube -n "Santi_Middle_2" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $middle2Mesh = $middle2MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $middle2Mesh;
+        select -r ($middle2Mesh + ".vtx[0]") ;move -ws 90.74198157 142.6000824 -5.662015915;
+        select -r ($middle2Mesh + ".vtx[1]") ;move -ws 91.81544495 142.5230408 -5.791103363;
+        select -r ($middle2Mesh + ".vtx[2]") ;move -ws 92.74529272 142.5212555 -5.829804897;
+        select -r ($middle2Mesh + ".vtx[3]") ;move -ws 90.73751825 143.3167114 -5.31196022;
+        select -r ($middle2Mesh + ".vtx[4]") ;move -ws 91.88154602 143.1651764 -5.33821106;
+        select -r ($middle2Mesh + ".vtx[5]") ;move -ws 92.92138678 143.1651917 -5.407640457;
+        select -r ($middle2Mesh + ".vtx[6]") ;move -ws 90.96614075 144.1099396 -5.280067921;
+        select -r ($middle2Mesh + ".vtx[7]") ;move -ws 91.94989014 144.0094604 -5.395120621;
+        select -r ($middle2Mesh + ".vtx[8]") ;move -ws 92.71627814 144.014267 -5.385516167;
+        select -r ($middle2Mesh + ".vtx[9]") ;move -ws 90.76744765 144.5425563 -6.127172589;
+        select -r ($middle2Mesh + ".vtx[10]") ;move -ws 91.92745972 144.4469299 -6.116835594;
+        select -r ($middle2Mesh + ".vtx[11]") ;move -ws 92.73910528 144.514679 -6.132610321;
+        select -r ($middle2Mesh + ".vtx[12]") ;move -ws 90.86837769 144.3393402 -6.825026035;
+        select -r ($middle2Mesh + ".vtx[13]") ;move -ws 91.9198761 144.2819672 -6.842084885;
+        select -r ($middle2Mesh + ".vtx[14]") ;move -ws 92.60762793 144.3503571 -6.893558502;
+        select -r ($middle2Mesh + ".vtx[15]") ;move -ws 90.60772705 143.6352844 -7.121818542;
+        select -r ($middle2Mesh + ".vtx[16]") ;move -ws 91.92366034 143.5313416 -7.225306511;
+        select -r ($middle2Mesh + ".vtx[17]") ;move -ws 93.19114381 143.4500618 -7.019310117;
+        select -r ($middle2Mesh + ".vtx[18]") ;move -ws 90.68915558 142.8200989 -7.129134655;
+        select -r ($middle2Mesh + ".vtx[19]") ;move -ws 91.87762451 142.7014923 -7.205357552;
+        select -r ($middle2Mesh + ".vtx[20]") ;move -ws 92.81410581 142.7999609 -7.133986056;
+        select -r ($middle2Mesh + ".vtx[21]") ;move -ws 90.59312433 142.592926 -6.361063957;
+        select -r ($middle2Mesh + ".vtx[22]") ;move -ws 91.83901978 142.3588715 -6.574596405;
+        select -r ($middle2Mesh + ".vtx[23]") ;move -ws 92.89171606 142.4720459 -6.559063911;
+        select -r ($middle2Mesh + ".vtx[24]") ;move -ws 93.28163153 143.3196564 -6.351305962;
+        select -r ($middle2Mesh + ".vtx[25]") ;move -ws 90.50312048 143.4830017 -6.190343857;
+
+        string $middle3MeshA[] = `polyCube -n "Santi_Middle_3" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $middle3Mesh = $middle3MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $middle3Mesh;
+        select -r ($middle3Mesh + ".vtx[0]") ;move -ws 94.64602655 142.6295013 -5.550125122;
+        select -r ($middle3Mesh + ".vtx[1]") ;move -ws 95.71430206 142.6835327 -5.552845955;
+        select -r ($middle3Mesh + ".vtx[2]") ;move -ws 96.96855932 142.9401245 -5.872326851;
+        select -r ($middle3Mesh + ".vtx[3]") ;move -ws 94.38746148 143.2571291 -5.26837635;
+        select -r ($middle3Mesh + ".vtx[4]") ;move -ws 95.60125732 143.1348724 -5.334925652;
+        select -r ($middle3Mesh + ".vtx[5]") ;move -ws 97.00511938 143.4107466 -5.60559082;
+        select -r ($middle3Mesh + ".vtx[6]") ;move -ws 94.40660089 143.9121094 -5.192523956;
+        select -r ($middle3Mesh + ".vtx[7]") ;move -ws 95.59553528 143.7100067 -5.17713213;
+        select -r ($middle3Mesh + ".vtx[8]") ;move -ws 96.95745856 143.7696228 -5.571064949;
+        select -r ($middle3Mesh + ".vtx[9]") ;move -ws 94.38712037 144.4943838 -6.094513327;
+        select -r ($middle3Mesh + ".vtx[10]") ;move -ws 95.53765869 144.3137512 -6.131085396;
+        select -r ($middle3Mesh + ".vtx[11]") ;move -ws 97.25842267 143.9693451 -6.223877907;
+        select -r ($middle3Mesh + ".vtx[12]") ;move -ws 94.51813507 144.3246307 -7.150629044;
+        select -r ($middle3Mesh + ".vtx[13]") ;move -ws 95.5559082 144.0687408 -7.148341179;
+        select -r ($middle3Mesh + ".vtx[14]") ;move -ws 96.86650854 143.9472198 -7.005051136;
+        select -r ($middle3Mesh + ".vtx[15]") ;move -ws 94.49647945 143.6246147 -7.327745616;
+        select -r ($middle3Mesh + ".vtx[16]") ;move -ws 95.64337164 143.5010376 -7.222021103;
+        select -r ($middle3Mesh + ".vtx[17]") ;move -ws 96.96293646 143.6697083 -7.071432114;
+        select -r ($middle3Mesh + ".vtx[18]") ;move -ws 94.62728119 142.9550934 -7.336852551;
+        select -r ($middle3Mesh + ".vtx[19]") ;move -ws 95.72196198 142.9972534 -7.352370262;
+        select -r ($middle3Mesh + ".vtx[20]") ;move -ws 96.91136175 143.1025543 -7.074975967;
+        select -r ($middle3Mesh + ".vtx[21]") ;move -ws 94.44349855 142.5106803 -6.433432959;
+        select -r ($middle3Mesh + ".vtx[22]") ;move -ws 95.6664331 142.3362884 -6.526304377;
+        select -r ($middle3Mesh + ".vtx[23]") ;move -ws 96.99013513 142.800354 -6.394971848;
+        select -r ($middle3Mesh + ".vtx[24]") ;move -ws 97.33457071 143.5825333 -6.28557007;
+        select -r ($middle3Mesh + ".vtx[25]") ;move -ws 93.9507603 143.4961363 -6.209967494;
+
+        string $ring1MeshA[] = `polyCube -n "Santi_Ring_1" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $ring1Mesh = $ring1MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $ring1Mesh;
+        select -r ($ring1Mesh + ".vtx[0]") ;move -ws 86.47085571 142.8720703 -7.55393219;
+        select -r ($ring1Mesh + ".vtx[1]") ;move -ws 87.68733081 142.7834146 -7.668634355;
+        select -r ($ring1Mesh + ".vtx[2]") ;move -ws 88.68113703 142.8141174 -7.691106796;
+        select -r ($ring1Mesh + ".vtx[3]") ;move -ws 86.35230613 143.9039042 -7.12618351;
+        select -r ($ring1Mesh + ".vtx[4]") ;move -ws 87.68112057 143.7058497 -7.246921301;
+        select -r ($ring1Mesh + ".vtx[5]") ;move -ws 89.12013245 143.5667725 -7.407522202;
+        select -r ($ring1Mesh + ".vtx[6]") ;move -ws 86.60198975 144.6869202 -7.395539284;
+        select -r ($ring1Mesh + ".vtx[7]") ;move -ws 87.83289337 144.4650116 -7.562046051;
+        select -r ($ring1Mesh + ".vtx[8]") ;move -ws 88.86425781 144.3778381 -7.562642992;
+        select -r ($ring1Mesh + ".vtx[9]") ;move -ws 86.61901855 144.9267425 -8.271261215;
+        select -r ($ring1Mesh + ".vtx[10]") ;move -ws 88.18800354 144.7397156 -8.314723969;
+        select -r ($ring1Mesh + ".vtx[11]") ;move -ws 89.26673901 144.605896 -8.254789352;
+        select -r ($ring1Mesh + ".vtx[12]") ;move -ws 86.69999695 144.8418426 -9.223760605;
+        select -r ($ring1Mesh + ".vtx[13]") ;move -ws 87.97698212 144.5750427 -9.065536499;
+        select -r ($ring1Mesh + ".vtx[14]") ;move -ws 88.97575378 144.4994812 -9.047994614;
+        select -r ($ring1Mesh + ".vtx[15]") ;move -ws 86.50828898 144.0154823 -9.436806917;
+        select -r ($ring1Mesh + ".vtx[16]") ;move -ws 87.93704987 143.8174438 -9.418036461;
+        select -r ($ring1Mesh + ".vtx[17]") ;move -ws 89.29174042 143.6217957 -9.208806992;
+        select -r ($ring1Mesh + ".vtx[18]") ;move -ws 86.616745 143.0241546 -9.316645622;
+        select -r ($ring1Mesh + ".vtx[19]") ;move -ws 87.77060208 142.9070206 -9.229712605;
+        select -r ($ring1Mesh + ".vtx[20]") ;move -ws 88.85809326 142.8808441 -9.136600494;
+        select -r ($ring1Mesh + ".vtx[21]") ;move -ws 86.48815918 142.7945251 -8.452748299;
+        select -r ($ring1Mesh + ".vtx[22]") ;move -ws 87.74917603 142.4710693 -8.415399149;
+        select -r ($ring1Mesh + ".vtx[23]") ;move -ws 89.07257843 142.7268982 -8.363227844;
+        select -r ($ring1Mesh + ".vtx[24]") ;move -ws 89.55134583 143.5911865 -8.252577782;
+        select -r ($ring1Mesh + ".vtx[25]") ;move -ws 86.21411133 143.9776611 -8.296456337;
+
+        string $ring2MeshA[] = `polyCube -n "Santi_Ring_2" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $ring2Mesh = $ring2MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $ring2Mesh;
+        select -r ($ring2Mesh + ".vtx[0]"); move -ws 90.01528931 142.769989 -7.790828705;
+        select -r ($ring2Mesh + ".vtx[1]"); move -ws 91.0743103 142.6054535 -7.860694885;
+        select -r ($ring2Mesh + ".vtx[2]"); move -ws 92.00061798 142.5504761 -7.868331909;
+        select -r ($ring2Mesh + ".vtx[3]"); move -ws 90.04065704 143.4895782 -7.479270935;
+        select -r ($ring2Mesh + ".vtx[4]"); move -ws 91.16578674 143.2658997 -7.443154335;
+        select -r ($ring2Mesh + ".vtx[5]"); move -ws 92.20175171 143.1954498 -7.48001194;
+        select -r ($ring2Mesh + ".vtx[6]"); move -ws 90.32017517 144.2527161 -7.496219158;
+        select -r ($ring2Mesh + ".vtx[7]"); move -ws 91.29115295 144.0957184 -7.553695202;
+        select -r ($ring2Mesh + ".vtx[8]"); move -ws 92.05741119 144.046112 -7.522956371;
+        select -r ($ring2Mesh + ".vtx[9]"); move -ws 90.34223175 144.5918426 -8.234348297;
+        select -r ($ring2Mesh + ".vtx[10]"); move -ws 91.32365417 144.4897461 -8.296709061;
+        select -r ($ring2Mesh + ".vtx[11]"); move -ws 92.13417053 144.4952087 -8.284266472;
+        select -r ($ring2Mesh + ".vtx[12]"); move -ws 90.28618622 144.3899536 -9.025835991;
+        select -r ($ring2Mesh + ".vtx[13]"); move -ws 91.33040619 144.2756653 -9.006121635;
+        select -r ($ring2Mesh + ".vtx[14]"); move -ws 92.0259552 144.2888183 -9.030688286;
+        select -r ($ring2Mesh + ".vtx[15]"); move -ws 89.99494934 143.6985321 -9.293224335;
+        select -r ($ring2Mesh + ".vtx[16]"); move -ws 91.29798126 143.5073242 -9.346103668;
+        select -r ($ring2Mesh + ".vtx[17]"); move -ws 92.22558594 143.3595886 -9.331814766;
+        select -r ($ring2Mesh + ".vtx[18]"); move -ws 90.02376556 142.8918457 -9.242554665;
+        select -r ($ring2Mesh + ".vtx[19]"); move -ws 91.19651031 142.6887512 -9.271385193;
+        select -r ($ring2Mesh + ".vtx[20]"); move -ws 92.08291626 142.6549682 -9.230620384;
+        select -r ($ring2Mesh + ".vtx[21]"); move -ws 89.88526154 142.7177734 -8.478240013;
+        select -r ($ring2Mesh + ".vtx[22]"); move -ws 91.11320496 142.3866424 -8.628352165;
+        select -r ($ring2Mesh + ".vtx[23]"); move -ws 92.16730499 142.4389953 -8.576967239;
+        select -r ($ring2Mesh + ".vtx[24]"); move -ws 92.60758209 143.2656097 -8.408407211;
+        select -r ($ring2Mesh + ".vtx[25]"); move -ws 89.84205627 143.6160431 -8.366363525;
+
+
+        string $ring3MeshA[] = `polyCube -n "Santi_Ring_3" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        move -r 88.097 143.319 -6.372;
+        string $ring3Mesh = $ring3MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $ring3Mesh;
+        select -r ($ring3Mesh + ".vtx[0]"); move -ws 93.99549866 142.8173675 -7.867352962;
+        select -r ($ring3Mesh + ".vtx[1]"); move -ws 94.93288422 142.8799744 -7.89308548;
+        select -r ($ring3Mesh + ".vtx[2]"); move -ws 96.0933075 143.2511139 -8.038209915;
+        select -r ($ring3Mesh + ".vtx[3]"); move -ws 93.53233337 143.4822998 -7.499500275;
+        select -r ($ring3Mesh + ".vtx[4]"); move -ws 94.77937317 143.5128326 -7.445923805;
+        select -r ($ring3Mesh + ".vtx[5]"); move -ws 96.14859009 143.7570495 -7.738936901;
+        select -r ($ring3Mesh + ".vtx[6]"); move -ws 93.61231232 144.2957306 -7.488675117;
+        select -r ($ring3Mesh + ".vtx[7]"); move -ws 94.66629028 144.2287903 -7.474758148;
+        select -r ($ring3Mesh + ".vtx[8]"); move -ws 95.98672485 144.2778473 -7.681060791;
+        select -r ($ring3Mesh + ".vtx[9]"); move -ws 93.49836731 144.6624145 -8.363927841;
+        select -r ($ring3Mesh + ".vtx[10]"); move -ws 94.64209747 144.5578308 -8.232892036;
+        select -r ($ring3Mesh + ".vtx[11]"); move -ws 96.1532135 144.5018158 -8.2483778;
+        select -r ($ring3Mesh + ".vtx[12]"); move -ws 93.76570892 144.6653137 -9.085621834;
+        select -r ($ring3Mesh + ".vtx[13]"); move -ws 94.69996643 144.5138855 -8.990021706;
+        select -r ($ring3Mesh + ".vtx[14]"); move -ws 95.94207764 144.4364624 -8.90791893;
+        select -r ($ring3Mesh + ".vtx[15]"); move -ws 93.70809937 143.8673554 -9.384343147;
+        select -r ($ring3Mesh + ".vtx[16]"); move -ws 94.82627106 143.8737793 -9.319355011;
+        select -r ($ring3Mesh + ".vtx[17]"); move -ws 96.16210175 143.9172516 -9.029368401;
+        select -r ($ring3Mesh + ".vtx[18]"); move -ws 94.04089355 143.0513916 -9.3139534;
+        select -r ($ring3Mesh + ".vtx[19]"); move -ws 95.02038574 143.1040802 -9.265278816;
+        select -r ($ring3Mesh + ".vtx[20]"); move -ws 96.07627869 143.3943176 -9.024730682;
+        select -r ($ring3Mesh + ".vtx[21]"); move -ws 93.90964508 142.7815399 -8.623831749;
+        select -r ($ring3Mesh + ".vtx[22]"); move -ws 95.01555634 142.7681579 -8.638626099;
+        select -r ($ring3Mesh + ".vtx[23]"); move -ws 96.19747925 143.2771301 -8.540698051;
+        select -r ($ring3Mesh + ".vtx[24]"); move -ws 96.47674561 143.9107666 -8.299181938;
+        select -r ($ring3Mesh + ".vtx[25]"); move -ws 93.12756348 143.6685791 -8.53523922;
+
+        string $pinky1MeshA[] = `polyCube -n "Santi_Pinky_1" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        string $pinky1Mesh = $pinky1MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $pinky1Mesh;
+        select -r ($pinky1Mesh + ".vtx[0]"); move -ws 85.48805237 142.4925232 -9.947912216;
+        select -r ($pinky1Mesh + ".vtx[1]"); move -ws 86.71683502 142.381134 -10.19194317;
+        select -r ($pinky1Mesh + ".vtx[2]"); move -ws 87.70343781 142.4102936 -10.23325348;
+        select -r ($pinky1Mesh + ".vtx[3]"); move -ws 85.37253571 143.5482483 -9.693842888;
+        select -r ($pinky1Mesh + ".vtx[4]"); move -ws 86.77008057 143.3870392 -9.845493317;
+        select -r ($pinky1Mesh + ".vtx[5]"); move -ws 88.01477814 143.2664948 -9.975242615;
+        select -r ($pinky1Mesh + ".vtx[6]"); move -ws 85.57901764 144.352066 -10.01144791;
+        select -r ($pinky1Mesh + ".vtx[7]"); move -ws 86.85281372 144.1380768 -10.25898457;
+        select -r ($pinky1Mesh + ".vtx[8]"); move -ws 87.86629486 144.0901947 -10.25879669;
+        select -r ($pinky1Mesh + ".vtx[9]"); move -ws 85.51016998 144.550766 -10.99536705;
+        select -r ($pinky1Mesh + ".vtx[10]"); move -ws 86.93260193 144.3699036 -11.07526684;
+        select -r ($pinky1Mesh + ".vtx[11]"); move -ws 88.1986084 144.2516785 -11.09086227;
+        select -r ($pinky1Mesh + ".vtx[12]"); move -ws 85.60975647 144.3129425 -11.97167683;
+        select -r ($pinky1Mesh + ".vtx[13]"); move -ws 86.9115448 144.1098785 -11.85684776;
+        select -r ($pinky1Mesh + ".vtx[14]"); move -ws 87.88053894 144.0214844 -11.88704681;
+        select -r ($pinky1Mesh + ".vtx[15]"); move -ws 85.40090942 143.422348 -12.04627323;
+        select -r ($pinky1Mesh + ".vtx[16]"); move -ws 86.87049866 143.2479248 -12.09937859;
+        select -r ($pinky1Mesh + ".vtx[17]"); move -ws 88.10730743 143.1118317 -12.03722954;
+        select -r ($pinky1Mesh + ".vtx[18]"); move -ws 85.53839874 142.4500275 -11.81951141;
+        select -r ($pinky1Mesh + ".vtx[19]"); move -ws 86.78941345 142.3386841 -11.79154587;
+        select -r ($pinky1Mesh + ".vtx[20]"); move -ws 87.86555481 142.3392334 -11.74190521;
+        select -r ($pinky1Mesh + ".vtx[21]"); move -ws 85.41144562 142.2170258 -10.96806717;
+        select -r ($pinky1Mesh + ".vtx[22]"); move -ws 86.7440033 141.967926 -11.05099869;
+        select -r ($pinky1Mesh + ".vtx[23]"); move -ws 87.95198059 142.1626587 -10.99748039;
+        select -r ($pinky1Mesh + ".vtx[24]"); move -ws 88.58647156 143.1661072 -10.99933624;
+        select -r ($pinky1Mesh + ".vtx[25]"); move -ws 85.20949554 143.5803909 -10.92865932;
+
+        string $pinky2MeshA[] = `polyCube -n "Santi_Pinky_2" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        string $pinky2Mesh = $pinky2MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $pinky2Mesh;
+        select -r ($pinky2Mesh + ".vtx[0]"); move -ws 89.23941044 142.4511414 -10.30088616;
+        select -r ($pinky2Mesh + ".vtx[1]"); move -ws 90.21334838 142.4157715 -10.40287112;
+        select -r ($pinky2Mesh + ".vtx[2]"); move -ws 91.05575562 142.4668121 -10.43391894;
+        select -r ($pinky2Mesh + ".vtx[3]"); move -ws 89.18862151 143.1879425 -10.01628022;
+        select -r ($pinky2Mesh + ".vtx[4]"); move -ws 90.23182678 143.098053 -10.01015855;
+        select -r ($pinky2Mesh + ".vtx[5]"); move -ws 91.17327886 143.149826 -10.07200522;
+        select -r ($pinky2Mesh + ".vtx[6]"); move -ws 89.35086821 143.9837646 -10.06127646;
+        select -r ($pinky2Mesh + ".vtx[7]"); move -ws 90.24650574 143.9336853 -10.14837265;
+        select -r ($pinky2Mesh + ".vtx[8]"); move -ws 90.94264219 143.9783783 -10.13585563;
+        select -r ($pinky2Mesh + ".vtx[9]"); move -ws 89.3128357 144.2920837 -10.81897068;
+        select -r ($pinky2Mesh + ".vtx[10]"); move -ws 90.21000671 144.3014373 -10.90579033;
+        select -r ($pinky2Mesh + ".vtx[11]"); move -ws 90.94027708 144.406662 -10.91942787;
+        select -r ($pinky2Mesh + ".vtx[12]"); move -ws 89.26586151 144.0611267 -11.60530281;
+        select -r ($pinky2Mesh + ".vtx[13]"); move -ws 90.22070312 144.0668793 -11.60962963;
+        select -r ($pinky2Mesh + ".vtx[14]"); move -ws 90.84410095 144.1636353 -11.65685844;
+        select -r ($pinky2Mesh + ".vtx[15]"); move -ws 89.07405855 143.32724 -11.84049704;
+        select -r ($pinky2Mesh + ".vtx[16]"); move -ws 90.27069092 143.2871551 -11.92270087;
+        select -r ($pinky2Mesh + ".vtx[17]"); move -ws 91.12554934 143.2512207 -11.93379208;
+        select -r ($pinky2Mesh + ".vtx[18]"); move -ws 89.1936951 142.5259552 -11.76735962;
+        select -r ($pinky2Mesh + ".vtx[19]"); move -ws 90.27513123 142.4640198 -11.82180982;
+        select -r ($pinky2Mesh + ".vtx[20]"); move -ws 91.08121491 142.5329437 -11.80918787;
+        select -r ($pinky2Mesh + ".vtx[21]"); move -ws 89.11016844 142.364685 -10.98983669;
+        select -r ($pinky2Mesh + ".vtx[22]"); move -ws 90.25265502 142.1782226 -11.16516113;
+        select -r ($pinky2Mesh + ".vtx[23]"); move -ws 91.19937899 142.354126 -11.14789677;
+        select -r ($pinky2Mesh + ".vtx[24]"); move -ws 91.50500483 143.2341003 -11.01728821;
+        select -r ($pinky2Mesh + ".vtx[25]"); move -ws 88.9727326 143.2575073 -10.90406418;
+
+        string $pinky3MeshA[] = `polyCube -n "Santi_Pinky_3" -w 1 -h 1 -d 1 -sd 2 -sh 2 -sw 2`;
+        string $pinky3Mesh = $pinky3MeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $pinky3Mesh;
+        select -r ($pinky3Mesh + ".vtx[0]"); move -ws 92.46720874 142.3877258 -10.47971418;
+        select -r ($pinky3Mesh + ".vtx[1]"); move -ws 93.28897845 142.4232635 -10.54047372;
+        select -r ($pinky3Mesh + ".vtx[2]"); move -ws 94.30879962 142.7543488 -10.72156932;
+        select -r ($pinky3Mesh + ".vtx[3]"); move -ws 92.09430682 143.0735321 -10.10962894;
+        select -r ($pinky3Mesh + ".vtx[4]"); move -ws 93.18824756 143.0662842 -10.10931327;
+        select -r ($pinky3Mesh + ".vtx[5]"); move -ws 94.38030994 143.2647247 -10.43917491;
+        select -r ($pinky3Mesh + ".vtx[6]"); move -ws 92.18459308 143.8863983 -10.0977452;
+        select -r ($pinky3Mesh + ".vtx[7]"); move -ws 93.10678088 143.7857514 -10.12857368;
+        select -r ($pinky3Mesh + ".vtx[8]"); move -ws 94.25573718 143.7935944 -10.37311294;
+        select -r ($pinky3Mesh + ".vtx[9]"); move -ws 92.05963885 144.2442627 -10.92288186;
+        select -r ($pinky3Mesh + ".vtx[10]"); move -ws 93.06259143 144.1042481 -10.84452321;
+        select -r ($pinky3Mesh + ".vtx[11]"); move -ws 94.3823241 144.003601 -10.91947725;
+        select -r ($pinky3Mesh + ".vtx[12]"); move -ws 92.26406848 144.2344818 -11.61979749;
+        select -r ($pinky3Mesh + ".vtx[13]"); move -ws 93.081375 144.0515137 -11.56431081;
+        select -r ($pinky3Mesh + ".vtx[14]"); move -ws 94.17101276 143.9386443 -11.53842141;
+        select -r ($pinky3Mesh + ".vtx[15]"); move -ws 92.18203723 143.4309082 -11.90153386;
+        select -r ($pinky3Mesh + ".vtx[16]"); move -ws 93.16299426 143.4031372 -11.88297155;
+        select -r ($pinky3Mesh + ".vtx[17]"); move -ws 94.34440601 143.4091797 -11.66237666;
+        select -r ($pinky3Mesh + ".vtx[18]"); move -ws 92.45486438 142.6026459 -11.85257556;
+        select -r ($pinky3Mesh + ".vtx[19]"); move -ws 93.31599414 142.6282501 -11.84445455;
+        select -r ($pinky3Mesh + ".vtx[20]"); move -ws 94.25908649 142.8861389 -11.65912034;
+        select -r ($pinky3Mesh + ".vtx[21]"); move -ws 92.36193073 142.3481598 -11.19276979;
+        select -r ($pinky3Mesh + ".vtx[22]"); move -ws 93.32826221 142.3012696 -11.25062539;
+        select -r ($pinky3Mesh + ".vtx[23]"); move -ws 94.37886035 142.7737122 -11.20325162;
+        select -r ($pinky3Mesh + ".vtx[24]"); move -ws 94.64833057 143.4015198 -10.98270585;
+        select -r ($pinky3Mesh + ".vtx[25]"); move -ws 91.70368945 143.2598419 -11.07438066;
+
+
+
+        //Dedos de la mano END
+
+        string $uplegmeshA[] = `polyCube -n "Santi_UpLeg" -w 10 -h 10 -d 10 -sd 2 -sh 4 -sw 2`;
+        move -rpr 10.623 73.457 0.097;
+        string $uplegmesh = $uplegmeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $uplegmesh;
+        select -r ($uplegmesh + ".vtx[0]");move -r -1.348304 -17.325169 0.426298 ;
+        select -r ($uplegmesh + ".vtx[1]");move -r -3.076276 -17.266026 1.203867 ;
+        select -r ($uplegmesh + ".vtx[2]");move -r -4.174168 -15.841869 0.506829 ;
+        select -r ($uplegmesh + ".vtx[3]");move -r -0.78703 -13.387699 1.568488 ;
+        select -r ($uplegmesh + ".vtx[4]");move -r -2.753864 -13.16811 2.078968 ;
+        select -r ($uplegmesh + ".vtx[5]");move -r -4.86067 -12.965065 1.870894 ;
+        select -r ($uplegmesh + ".vtx[6]");move -r -0.466346 -8.313385 0.329076 ;
+        select -r ($uplegmesh + ".vtx[7]");move -r -3.152279 -8.123497 1.256795 ;
+        select -r ($uplegmesh + ".vtx[8]");move -r -5.853127 -7.756889 1.402405 ;
+        select -r ($uplegmesh + ".vtx[9]");move -r -0.770563 0.314789 4.1211 ;
+        select -r ($uplegmesh + ".vtx[10]");move -r -1.045996 2.660629 6.228407 ;
+        select -r ($uplegmesh + ".vtx[11]");move -r -1.255811 5.317108 5.742366 ;
+        select -r ($uplegmesh + ".vtx[12]");move -r 0.934689 9.302589 4.251626 ;
+        select -r ($uplegmesh + ".vtx[13]");move -r 0.810457 13.424065 4.489552 ;
+        select -r ($uplegmesh + ".vtx[14]");move -r 0.607042 16.54628 2.63503 ;
+        select -r ($uplegmesh + ".vtx[15]");move -r -3.641059 4.478294 0.718694 ;
+        select -r ($uplegmesh + ".vtx[16]");move -r -1.005062 12.138115 0.185836 ;
+        select -r ($uplegmesh + ".vtx[17]");move -r 1.733983 17.325173 3.275497 ;
+        select -r ($uplegmesh + ".vtx[18]");move -r -1.370717 6.052948 -1.424685 ;
+        select -r ($uplegmesh + ".vtx[19]");move -r 3.946287 12.427269 -3.28343 ;
+        select -r ($uplegmesh + ".vtx[20]");move -r 2.231633 17.117883 2.165638 ;
+        select -r ($uplegmesh + ".vtx[21]");move -r -2.195036 0.1978 -1.911002 ;
+        select -r ($uplegmesh + ".vtx[22]");move -r 2.235378 3.411552 -6.227472 ;
+        select -r ($uplegmesh + ".vtx[23]");move -r 3.622033 6.611489 3.870755 ;
+        select -r ($uplegmesh + ".vtx[24]");move -r 0.62947 -6.698105 -1.79873 ;
+        select -r ($uplegmesh + ".vtx[25]");move -r 1.482726 -6.959778 -2.91593 ;
+        select -r ($uplegmesh + ".vtx[26]");move -r -0.144738 -5.63803 3.937054 ;
+        select -r ($uplegmesh + ".vtx[27]");move -r 0.366908 -9.410926 -1.876949 ;
+        select -r ($uplegmesh + ".vtx[28]");move -r 2.928128 -9.639091 -3.188219 ;
+        select -r ($uplegmesh + ".vtx[29]");move -r 0.405397 -9.239647 2.37686 ;
+        select -r ($uplegmesh + ".vtx[30]");move -r 1.002166 -12.897979 -0.892826 ;
+        select -r ($uplegmesh + ".vtx[31]");move -r 2.420893 -13.147571 -1.429704 ;
+        select -r ($uplegmesh + ".vtx[32]");move -r -0.0988041 -13.293064 2.874734 ;
+        select -r ($uplegmesh + ".vtx[33]");move -r -3.114313 -14.798343 -1.304881 ;
+        select -r ($uplegmesh + ".vtx[34]");move -r -1.35194 -14.134537 0.140568 ;
+        select -r ($uplegmesh + ".vtx[35]");move -r -1.132146 -13.520538 2.711032 ;
+        select -r ($uplegmesh + ".vtx[36]");move -r -1.900446 -10.920433 2.385228 ;
+        select -r ($uplegmesh + ".vtx[37]");move -r -2.554168 -7.1436 2.793765 ;
+        select -r ($uplegmesh + ".vtx[38]");move -r 2.069318 6.3313 4.702355 ;
+        select -r ($uplegmesh + ".vtx[39]");move -r -1.875324 -10.920021 -1.129465 ;
+        select -r ($uplegmesh + ".vtx[40]");move -r -0.769635 -7.64724 -0.592278 ;
+        select -r ($uplegmesh + ".vtx[41]");move -r -3.711324 -0.253502 0.318902 ;
+
+        string $legmeshA[] = `polyCube -n "Santi_Leg" -w 10 -h 10 -d 10 -sd 2 -sh 4 -sw 2`;
+        move -rpr 9.426 32.053 -2.209;
+        string $legmesh = $legmeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $legmesh;
+
+        select -r ($legmesh + ".vtx[0]");move -r -0.128881 -13.471304 -4.93648 ;
+        select -r ($legmesh + ".vtx[1]");move -r -2.435213 -14.595233 -2.664385 ;
+        select -r ($legmesh + ".vtx[2]");move -r -4.459095 -15.00707 -0.73893 ;
+        select -r ($legmesh + ".vtx[3]");move -r 0.894071 -6.424468 -4.253818 ;
+        select -r ($legmesh + ".vtx[4]");move -r -2.372256 -6.58211 -2.718848 ;
+        select -r ($legmesh + ".vtx[5]");move -r -5.305526 -6.673398 -1.960391 ;
+        select -r ($legmesh + ".vtx[6]");move -r 1.081354 -0.809996 -2.617208 ;
+        select -r ($legmesh + ".vtx[7]");move -r -1.957765 -1.128495 -1.311409 ;
+        select -r ($legmesh + ".vtx[8]");move -r -4.748949 -1.341052 -0.915374 ;
+        select -r ($legmesh + ".vtx[9]");move -ws 4.530666 43.395676 3.476875;
+        select -r ($legmesh + ".vtx[10]");move -r 0.0381151 9.787546 2.911935 ;
+        select -r ($legmesh + ".vtx[11]");move -r -1.173831 10.656969 2.155704 ;
+        select -r ($legmesh + ".vtx[12]");move -ws 5.685711742 48.4922128 3.371007553;
+        select -r ($legmesh + ".vtx[13]");move -r 0.47341 12.103231 3.569458 ;
+        select -r ($legmesh + ".vtx[14]");move -r -0.960298 14.179239 2.683252 ;
+        select -r ($legmesh + ".vtx[15]");move -ws 3.477073074 49.48090794 -0.02277696991;
+        select -r ($legmesh + ".vtx[16]");move -r -0.171062 12.840181 1.949732 ;
+        select -r ($legmesh + ".vtx[17]");move -ws 16.11663091 52.44885495 0.329490057;
+        select -r ($legmesh + ".vtx[18]");move -ws 3.193096043 50.84875729 -4.589447626;
+        select -r ($legmesh + ".vtx[19]");move -ws 7.570407988 52.94869092 -8.185776123;
+        select -r ($legmesh + ".vtx[20]");move -ws 14.68827427 52.71564343 -5.202379354;
+        select -r ($legmesh + ".vtx[21]");move -ws 3.72442329 45.05928376 -6.744829067;
+        select -r ($legmesh + ".vtx[22]");move -ws 8.348986627 45.3509393 -10.01654757;
+        select -r ($legmesh + ".vtx[23]");move -ws 13.62935245 45.29291108 -7.104854473;
+        select -r ($legmesh + ".vtx[24]");move -r 1.220332 -0.0969873 0.368778 ;
+        select -r ($legmesh + ".vtx[25]");move -r 0.164675 -0.487904 -2.315194 ;
+        select -r ($legmesh + ".vtx[26]");move -ws 12.10629737 31.03572252 -6.05547131;
+        select -r ($legmesh + ".vtx[27]");move -r 1.923872 -6.216965 -0.408372 ;
+        select -r ($legmesh + ".vtx[28]");move -r -0.00975931 -6.660203 -1.11746 ;
+        select -r ($legmesh + ".vtx[29]");move -ws 12.6185869 22.40647939 -5.920062431;
+        select -r ($legmesh + ".vtx[30]");move -r 0.650546 -13.858519 -1.636963 ;
+        select -r ($legmesh + ".vtx[31]");move -ws 9.922309578 11.43195584 -8.778675922;
+        select -r ($legmesh + ".vtx[32]");move -r -0.55745 -15.696414 1.958984 ;
+        select -r ($legmesh + ".vtx[33]");move -r -0.45642 -13.214938 -4.29376 ;
+        select -r ($legmesh + ".vtx[34]");move -r -0.518458 -15.395392 -2.081479 ;
+        select -r ($legmesh + ".vtx[35]");move -r -1.250989 -15.748404 0.664741 ;
+        select -r ($legmesh + ".vtx[36]");move -r -2.858404 -7.221121 0.337123 ;
+        select -r ($legmesh + ".vtx[37]");move -r -2.020736 -1.381278 -0.0861882 ;
+        select -r ($legmesh + ".vtx[38]");move -r 1.642506 10.638509 1.163235 ;
+        select -r ($legmesh + ".vtx[39]");move -r 0.928396 -6.092324 -2.982409 ;
+        select -r ($legmesh + ".vtx[40]");move -r 0.713071 -0.535193 -1.745687 ;
+        select -r ($legmesh + ".vtx[41]");move -r -1.428514 9.660943 1.546446 ;
+
+        string $footMeshA[] = `polyCube -n "Santi_Foot" -w 10 -h 10 -d 10 -sd 2 -sh 4 -sw 2`;
+        move -rpr 10.062806 5.919581 0.587984 ;
+        rotate -r -os -fo -58.813607 0 0 ;
+        string $footMesh = $footMeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $footMesh;
+        select -r ($footMesh + ".vtx[0]");move -r -0.0869206 -2.192755 3.104177 ;
+        select -r ($footMesh + ".vtx[1]");move -r 0.354412 -2.030654 3.18178 ;
+        select -r ($footMesh + ".vtx[2]");move -r 0.545015 -4.229176 2.698148 ;
+        select -r ($footMesh + ".vtx[3]");move -r 0.583146 -0.951416 0.0645568 ;
+        select -r ($footMesh + ".vtx[4]");move -r 0.637066 -0.846257 0.733588 ;
+        select -r ($footMesh + ".vtx[5]");move -r 0.556545 -4.111476 0.0319755 ;
+        select -r ($footMesh + ".vtx[6]");move -r 0.344335 -1.234072 0.315737 ;
+        select -r ($footMesh + ".vtx[7]");move -r 0.696136 -1.35967 1.355743 ;  
+        select -r ($footMesh + ".vtx[8]");move -r -0.329581 -4.05433 -0.63818 ;
+        select -r ($footMesh + ".vtx[9]");move -r -0.0884384 -1.540444 0.580478 ;
+        select -r ($footMesh + ".vtx[10]");move -r -0.319593 -1.198707 1.38121 ;
+        select -r ($footMesh + ".vtx[11]");move -r -1.048132 -3.789564 -0.0531236 ;
+        select -r ($footMesh + ".vtx[12]");move -r -0.50196 -2.04146 0.916615 ;
+        select -r ($footMesh + ".vtx[13]");move -r -0.769073 -2.022176 1.095081 ;
+        select -r ($footMesh + ".vtx[14]");move -r -2.327618 -2.966188 0.862116 ;
+        select -r ($footMesh + ".vtx[15]");move -r -0.954429 2.71501 -0.905767 ;
+        select -r ($footMesh + ".vtx[16]");move -r -1.189154 2.081872 -0.607085 ;
+        select -r ($footMesh + ".vtx[17]");move -r -1.559806 -0.136234 -1.774594 ;
+        select -r ($footMesh + ".vtx[18]");move -r -0.0587252 6.302676 -0.458792 ;
+        select -r ($footMesh + ".vtx[19]");move -r -2.825485 5.167841 -1.980509 ;
+        select -r ($footMesh + ".vtx[20]");move -r -4.095033 3.974568 -2.24508 ;
+        select -r ($footMesh + ".vtx[21]");move -r 0.409863 1.1497 -1.832562 ;
+        select -r ($footMesh + ".vtx[22]");move -r -2.094773 0.522043 -5.507122 ;
+        select -r ($footMesh + ".vtx[23]");move -r -1.874662 0.529006 -2.767297 ;
+        select -r ($footMesh + ".vtx[24]");move -r 1.259159 -0.645957 -3.689287 ;
+        select -r ($footMesh + ".vtx[25]");move -r -1.200659 -1.068669 -5.846447 ;
+        select -r ($footMesh + ".vtx[26]");move -r -2.859723 -1.113356 -3.488482 ;
+        select -r ($footMesh + ".vtx[27]");move -r 1.209986 3.757896 4.647551 ;
+        select -r ($footMesh + ".vtx[28]");move -r -1.633634 1.914491 4.12038 ;
+        select -r ($footMesh + ".vtx[29]");move -r -2.220266 0.383064 4.592533 ;
+        select -r ($footMesh + ".vtx[30]");move -r 1.437841 1.806289 6.800121 ;
+        select -r ($footMesh + ".vtx[31]");move -r 0.274277 1.09534 7.085576 ;
+        select -r ($footMesh + ".vtx[32]");move -r -0.035179 1.930036 7.614794 ;
+        select -r ($footMesh + ".vtx[33]");move -r -0.150685 -0.0291505 4.760731 ;
+        select -r ($footMesh + ".vtx[34]");move -r 0.0263664 -0.361764 5.484556 ;
+        select -r ($footMesh + ".vtx[35]");move -r 0.564643 -0.677772 5.305128 ;
+        select -r ($footMesh + ".vtx[36]");move -r 0.16881 -1.87406 2.389169 ;
+        select -r ($footMesh + ".vtx[37]");move -r -1.163826 -2.541682 -0.0655495 ;
+        select -r ($footMesh + ".vtx[38]");move -r -1.224114 -1.371324 -0.867815 ;
+        select -r ($footMesh + ".vtx[39]");move -r 0.615055 0.91472 2.556962 ;
+        select -r ($footMesh + ".vtx[40]");move -r 0.905026 0.471405 -0.262145 ;
+        select -r ($footMesh + ".vtx[41]");move -r -0.0423306 1.037802 -0.955008 ;
+
+
+        string $toeMeshA[] = `polyCube -n "Santi_Toe" -w 10 -h 10 -d 10 -sd 2 -sh 2 -sw 2`;
+        string $toeMesh = $toeMeshA[0];
+        $bodyMeshArray[size($bodyMeshArray)] = $toeMesh;
+        move -rpr 10.967253 2.86909 16.123653 ;
+        select -r ($toeMesh + ".vtx[0]");move -r 1.28115 2.849026 -1.451561 ;
+        select -r ($toeMesh + ".vtx[1]");move -r -0.977777 2.965788 -1.762832 ;
+        select -r ($toeMesh + ".vtx[2]");move -r -1.449015 3.149274 -4.117052 ;
+        select -r ($toeMesh + ".vtx[3]");move -r 0.941152 -0.59685 -1.201198 ;
+        select -r ($toeMesh + ".vtx[4]");move -r -0.804966 -0.241419 -1.169456 ;
+        select -r ($toeMesh + ".vtx[5]");move -r -0.909056 -1.059017 -3.830341 ;
+        select -r ($toeMesh + ".vtx[6]");move -r 1.917132 -4.280256 -1.901048 ;
+        select -r ($toeMesh + ".vtx[7]");move -r -1.114559 -4.230308 -2.414741 ;
+        select -r ($toeMesh + ".vtx[8]");move -r -0.990009 -5.294235 -4.450697 ;
+        select -r ($toeMesh + ".vtx[9]");move -r 1.122277 -2.943671 -0.0461994 ;
+        select -r ($toeMesh + ".vtx[10]");move -r -1.625636 -3.101241 -0.437867 ;
+        select -r ($toeMesh + ".vtx[11]");move -r -0.133798 -4.640511 -2.063561 ;
+        select -r ($toeMesh + ".vtx[12]");move -r 0.916516 -2.20173 2.141765 ;
+        select -r ($toeMesh + ".vtx[13]");move -r -2.061674 -2.309598 2.297956 ;
+        select -r ($toeMesh + ".vtx[14]");move -r -0.0874656 -4.749556 1.295469 ;
+        select -r ($toeMesh + ".vtx[15]");move -r -0.241147 0.611517 2.036113 ;
+        select -r ($toeMesh + ".vtx[16]");move -r -1.327386 -0.37999 0.893744 ;
+        select -r ($toeMesh + ".vtx[17]");move -r 0.111471 -1.217857 1.238945 ;
+        select -r ($toeMesh + ".vtx[18]");move -r 0.697525 2.500769 1.74803 ;
+        select -r ($toeMesh + ".vtx[19]");move -r -1.323515 2.301142 1.221088 ;
+        select -r ($toeMesh + ".vtx[20]");move -r -0.982034 2.455666 1.867081 ;
+        select -r ($toeMesh + ".vtx[21]");move -r 0.689956 2.565461 0.200528 ;
+        select -r ($toeMesh + ".vtx[22]");move -r -1.357687 2.238763 -0.183542 ;
+        select -r ($toeMesh + ".vtx[23]");move -r -1.053917 2.599849 -1.426267 ;
+        select -r ($toeMesh + ".vtx[24]");move -r -0.0401957 -1.127543 -2.140439 ;
+        select -r ($toeMesh + ".vtx[25]");move -r -0.0924008 0.151213 0.298573 ;
+
+        //LEFT BODY MODEL MESHES END
+
+        //SPHERES INIT
+        string $spheresArray[] = {}; 
+
+        string $toeSphereA[] = `polySphere -n "SantiToeSphere" -r 2.6 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 8.190498 3.331229 11.282167 ;
+        string $toeSphere = $toeSphereA[0];
+        $spheresArray[size($spheresArray)] = $toeSphere;
+
+        string $ankleSphereA[] = `polySphere -n "SantiAnkleSphere" -r 4.15 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 8.831656 10.488149 -3.717397 ;
+        string $ankleSphere = $ankleSphereA[0];
+        $spheresArray[size($spheresArray)] = $ankleSphere;
+
+        string $kneeSphereA[] = `polySphere -n "SantiKneeSphere" -r 6.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 9.369086 52.540054 -0.570068 ;
+        string $kneeSphere = $kneeSphereA[0];
+        $spheresArray[size($spheresArray)] = $kneeSphere;
+
+        string $legSphereA[] = `polySphere -n "SantiLegSphere" -r 9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 8.607617 93.630066 -0.070569 ;
+        string $legSphere = $legSphereA[0];
+        $spheresArray[size($spheresArray)] = $legSphere;
+
+        string $shoulderSphereA[] = `polySphere -n "SantiShoulderSphere" -r 5.5 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 18.760738 143.563858 -6.171442 ;
+        string $shoulderSphere = $shoulderSphereA[0];
+        $spheresArray[size($spheresArray)] = $shoulderSphere;
+
+        string $elbowSphereA[] = `polySphere -n "SantiElbowSphere" -r 4.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 46.165443 143.561447 -6.171463 ;
+        string $elbowSphere = $elbowSphereA[0];
+        $spheresArray[size($spheresArray)] = $elbowSphere;
+
+        string $handSphereA[] = `polySphere -n "SantiHandSphere" -r 2.75 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 73.779968 143.559006 -6.171491 ;
+        string $handSphere = $handSphereA[0];
+        $spheresArray[size($spheresArray)] = $handSphere;
+
+        string $thumb1SphereA[] = `polySphere -n "SantiThumb1Sphere" -r 2.17 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 77.568542 141.391449 -3.168499 ;
+        string $thumb1Sphere = $thumb1SphereA[0];
+        $spheresArray[size($spheresArray)] = $thumb1Sphere;
+
+        string $thumb2SphereA[] = `polySphere -n "SantiThumb2Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 81.243759 139.269196 -1.046493 ;
+        string $thumb2Sphere = $thumb2SphereA[0];
+        $spheresArray[size($spheresArray)] = $thumb2Sphere;
+
+        string $thumb3SphereA[] = `polySphere -n "SantiThumb3Sphere" -r 1 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 84.637993 137.309113 0.913225 ;
+        string $thumb3Sphere = $thumb3SphereA[0];
+        $spheresArray[size($spheresArray)] = $thumb3Sphere; 
+
+        string $index1SphereA[] = `polySphere -n "SantiIndex1Sphere" -r 1.4 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 86.046387 143.326157 -3.34943 ;
+        string $index1Sphere = $index1SphereA[0];
+        $spheresArray[size($spheresArray)] = $index1Sphere;
+
+        string $index2SphereA[] = `polySphere -n "SantiIndex2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 89.938477 143.325806 -3.34946 ;
+        string $index2Sphere = $index2SphereA[0];
+        $spheresArray[size($spheresArray)] = $index2Sphere; 
+
+        string $index3SphereA[] = `polySphere -n "SantiIndex3Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 93.353607 143.3255 -3.349488 ;
+        string $index3Sphere = $index3SphereA[0];
+        $spheresArray[size($spheresArray)] = $index3Sphere; 
+
+        string $middle1SphereA[] = `polySphere -n "SantiMiddle1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 86.55542 143.557922 -6.171548 ;
+        string $middle1Sphere = $middle1SphereA[0];
+        $spheresArray[size($spheresArray)] = $middle1Sphere;
+
+        string $middle2SphereA[] = `polySphere -n "SantiMiddle2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 90.169388 143.557602 -6.171496 ;
+        string $middle2Sphere = $middle2SphereA[0];
+        $spheresArray[size($spheresArray)] = $middle2Sphere;
+
+        string $middle3SphereA[] = `polySphere -n "SantiMiddle3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 93.629112 143.55722 -6.171623 ;
+        string $middle3Sphere = $middle3SphereA[0];
+        $spheresArray[size($spheresArray)] = $middle3Sphere;
+
+        string $ring1SphereA[] = `polySphere -n "SantiRing1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 85.92688 143.568024 -8.388193 ;
+        string $ring1Sphere = $ring1SphereA[0];
+        $spheresArray[size($spheresArray)] = $ring1Sphere;
+
+        string $ring2SphereA[] = `polySphere -n "SantiRing2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 89.528122 143.567673 -8.388186 ;
+        string $ring2Sphere = $ring2SphereA[0];
+        $spheresArray[size($spheresArray)] = $ring2Sphere;
+
+        string $ring3SphereA[] = `polySphere -n "SantiRing3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 92.835281 143.567291 -8.388219 ;
+        string $ring3Sphere = $ring3SphereA[0];
+        $spheresArray[size($spheresArray)] = $ring3Sphere;
+
+        string $pinky1SphereA[] = `polySphere -n "SantiPinky1Sphere" -r 1.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 84.688087 143.33197 -10.897327 ;
+        string $pinky1Sphere = $pinky1SphereA[0];
+        $spheresArray[size($spheresArray)] = $pinky1Sphere;
+
+        string $pinky2SphereA[] = `polySphere -n "SantiPinky2Sphere" -r 0.95 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 88.824699 143.331573 -10.89854 ;
+        string $pinky2Sphere = $pinky2SphereA[0];
+        $spheresArray[size($spheresArray)] = $pinky2Sphere;
+
+        string $pinky3SphereA[] = `polySphere -n "SantiPinky3Sphere" -r 0.9 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 91.419487 143.331375 -10.897312 ;
+        string $pinky3Sphere = $pinky3SphereA[0];
+        $spheresArray[size($spheresArray)] = $pinky3Sphere;
+
+        select -r $spheresArray;
+        string $leftSidePoly[] = `polyUnite -ch 1 -mergeUVSets 1 -objectPivot -n "SantiLeftSide"`;
+        DeleteHistory;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1 $leftSidePoly[0];
+        polySoftEdge -a 180 -ch 1 ($leftSidePoly[0] + ".e[0:8359]");
+
+        string $stomachSphereA[] = `polySphere -n "SantiStomachSphere" -r 14 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 0 104.839 0.03 ;
+        string $stomachSphere = $stomachSphereA[0];
+        polySoftEdge -a 180 -ch 1 ($stomachSphere + ".e[0:189]");
+
+        string $bustSphereA[] = `polySphere -n "SantiBustSphere" -r 12.4 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 0 129.004 1.639 ;
+        string $bustSphere = $bustSphereA[0];
+        polySoftEdge -a 180 -ch 1 ($bustSphere + ".e[0:189]");
+
+        string $neckSphereA[] = `polySphere -n "SantiNeckSphere" -r 5.3 -ax 0 1 0 -cuv 2 -ch 1 -sy 10 -sx 10`;
+        move -rpr 0 154.319 -1.994 ;
+        string $neckSphere = $neckSphereA[0];
+        polySoftEdge -a 180 -ch 1 ($neckSphere + ".e[0:189]");
+
+        //SPHERES END
+        select -r $bodyMeshArray;
+        polyUnite -ch 1 -mergeUVSets 1 -objectPivot;
+        polyMirrorFace  -cutMesh 0 -axis 0 -axisDirection 1 -mergeMode 1 -mergeThresholdType 1 -mergeThreshold 0.01 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0 -ch 1;
+        DeleteHistory;
+
+        select -add $leftSidePoly[0];
+        select -add $stomachSphere;
+        select -add $bustSphere;
+        select -add $neckSphere;
+        select -add $bodyCentalMeshesArray;
+
+
+        string $resultAvatarMeshA[] = `polyUnite -ch 1 -mergeUVSets 1 -objectPivot -name SantiAvatar`;
+        $resultAvatarMesh = $resultAvatarMeshA[0];    
+
+        DeleteHistory;
+
+        return $resultAvatarMesh;
+    }
+
+    global proc string[] GenerateMixamoSkeletor()
+    {
+        string $resultSkeletorArray[] = {"root"};
+        string $previousNamespace = `namespaceInfo -currentNamespace`;
+        string $namespaceName = "mixamorig";
+        if (!`namespace -exists $namespaceName`) {
+            namespace -add $namespaceName;
+        }
+        namespace -set $namespaceName;
+
+        //Generamos el esqueleto base, empezando con el locator raiz
+        string $rigRootLoc[] = `spaceLocator -n "Skeleton_Root" -p 0 0 0`;
+
+        //Generamos primero lo que es el tronco
+        string $hipJoint = `joint -n "Hips" -rad 10 -p 0 99.792 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $hipJoint;
+        string $spineJoint = `joint -n "Spine" -rad 10 -p 0 109.715 -1.227 -o -6.963 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $spineJoint;
+        string $spine1Joint = `joint -n "Spine1" -rad 10 -p 0 121.361 -2.650 -o 0.022 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $spine1Joint;
+        string $spine2Joint = `joint -n "Spine2" -rad 10 -p 0 134.721 -4.276 -o 6.617 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $spine2Joint;
+        string $neckJoint = `joint -n "Neck" -rad 10 -p 0 149.753 -3.467 -o 0.324 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $neckJoint;
+        string $headJoint = `joint -n "Head" -rad 10 -p 0 160.075 -0.325 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $headJoint;
+        string $headTopEndJoint = `joint -n "HeadTopEnd" -rad 10 -p 0 178.550 6.312 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $headTopEndJoint;
+
+        //Generamos la pierna izquierda
+        select -r $hipJoint;
+        string $leftUpLegJoint = `joint -n "LeftUpLeg" -rad 10 -p 9.124 93.135 -0.055 -o -0.728 0 -179.660`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftUpLegJoint;
+        string $leftLegJoint = `joint -n "LeftLeg" -rad 10 -p 9.369 52.540 -0.570 -o -2.076 0.009 -0.679`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftLegJoint;
+        string $leftFootJoint = `joint -n "LeftFoot" -rad 10 -p 9.124 10.492 -2.630 -o 65.468 -0.161 3.296`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftFootJoint;
+        string $leftToeJoint = `joint -n "LeftToeBase" -rad 10 -p 9.498 3.284 11.337 -o 26.412 -3.227 -2.567`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftToeJoint;
+        string $leftToeEndJoint = `joint -n "LeftToeEnd" -rad 10 -p 9.355908 3.108389 21.333958 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftToeEndJoint;
+
+        //Generamos el brazo izquierdo
+        select -r $spine2Joint;
+        string $leftShoulderJoint = `joint -n "LeftShoulder" -rad 10 -p 6.103 143.832 -3.571 -o -91.608 78.377 177.221`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftShoulderJoint;
+        string $leftArmJoint = `joint -n "LeftArm" -rad 10 -p 18.758 143.566 -6.171 -o -1.204 0 11.611`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftArmJoint;
+        string $leftForeArmJoint = `joint -n "LeftForeArm" -rad 10 -p 46.162 143.566 -6.171 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftForeArmJoint;
+        string $leftHandJoint = `joint -n "LeftHand" -rad 10 -p 73.777 143.566 -6.172 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandJoint;
+
+        //Generamos los dedos de la mano izquierda
+        string $leftHandThumb1Joint = `joint -n "LeftHandThumb1" -rad 10 -p 77.566 141.398 -3.169 -o 27.312 -12.921 23.413`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandThumb1Joint;
+        string $leftHandThumb2Joint = `joint -n "LeftHandThumb2" -rad 10 -p 81.241 139.276 -1.047 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandThumb2Joint;
+        string $leftHandThumb3Joint = `joint -n "LeftHandThumb3" -rad 10 -p 84.636 137.317 0.913 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandThumb3Joint;
+        string $leftHandThumb4Joint = `joint -n "LeftHandThumb4" -rad 10 -p 87.315 135.770 2.460 -o 2.142 14.318 8.602`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandThumb4Joint;
+
+        select -r $leftHandJoint;
+        string $leftHandIndex1Joint = `joint -n "LeftHandIndex1" -rad 10 -p 86.044 143.334 -3.350 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandIndex1Joint;
+        string $leftHandIndex2Joint = `joint -n "LeftHandIndex2" -rad 10 -p 89.936 143.334 -3.350 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandIndex2Joint;
+        string $leftHandIndex3Joint = `joint -n "LeftHandIndex3" -rad 10 -p 93.351 143.334 -3.350 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandIndex3Joint;
+        string $leftHandIndex4Joint = `joint -n "LeftHandIndex4" -rad 10 -p 96.429 143.334 -3.350 -o 0 0.459 0.003`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandIndex4Joint;
+
+        select -r $leftHandJoint;
+        string $leftHandMiddle1Joint = `joint -n "LeftHandMiddle1" -rad 10 -p 86.552 143.566 -6.172 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandMiddle1Joint;
+        string $leftHandMiddle2Joint = `joint -n "LeftHandMiddle2" -rad 10 -p 90.166 143.566 -6.172 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandMiddle2Joint;
+        string $leftHandMiddle3Joint = `joint -n "LeftHandMiddle3" -rad 10 -p 93.626 143.566 -6.172 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandMiddle3Joint;
+        string $leftHandMiddle4Joint = `joint -n "LeftHandMiddle4" -rad 10 -p 97.306 143.566 -6.172 -o 0 -0.525 -0.075`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandMiddle4Joint;
+
+        select -r $leftHandJoint;
+        string $leftHandRing1Joint = `joint -n "LeftHandRing1" -rad 10 -p 85.924 143.576 -8.388 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandRing1Joint;
+        string $leftHandRing2Joint = `joint -n "LeftHandRing2" -rad 10 -p 89.525 143.576 -8.388 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandRing2Joint;
+        string $leftHandRing3Joint = `joint -n "LeftHandRing3" -rad 10 -p 92.832 143.576 -8.388 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandRing3Joint;
+        string $leftHandRing4Joint = `joint -n "LeftHandRing4" -rad 10 -p 96.493 143.576 -8.388 -o 0.02 0.848 0.088`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandRing4Joint;
+
+        select -r $leftHandJoint;
+        string $leftHandPinky1Joint = `joint -n "LeftHandPinky1" -rad 10 -p 84.685 143.339 -10.397 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandPinky1Joint;
+        string $leftHandPinky2Joint = `joint -n "LeftHandPinky2" -rad 10 -p 88.822 143.339 -10.397 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandPinky2Joint;
+        string $leftHandPinky3Joint = `joint -n "LeftHandPinky3" -rad 10 -p 91.417 143.339 -10.397 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandPinky3Joint;
+        string $leftHandPinky4Joint = `joint -n "LeftHandPinky4" -rad 10 -p 94.340 143.339 -10.397 -o 0 0 0`;
+        $resultSkeletorArray[size($resultSkeletorArray)] = $leftHandPinky4Joint;
+
+        //Ahora hacemos Mirror de las partes izquierdas para generar las derechas
+        select -r $leftUpLegJoint;
+        mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
+
+        select -r $leftShoulderJoint;
+        mirrorJoint -mirrorYZ -searchReplace "Left" "Right";
+
+        //Finalmente devolvemos el namespace previo
+        namespace -set $previousNamespace;
+
+        //Seleccionamos el hip joint y luego hacemos un select hierarchy
+        select -r $hipJoint;
+        select -hierarchy; 
+        setKeyframe -t 0 -at "rotate" -at "translate" -at "scale" ;
+
+        //dejamos seleccionado el rig root locator
+        select -r $rigRootLoc[0];
+
+        $resultSkeletorArray[0] = $rigRootLoc[0];
+        return $resultSkeletorArray;
+        
+    }
+
+    global proc SetSkinWeightToOne (string $skeletorArrayName[], int $indexJoint, string $skinClusterName, string $avatarMeshName, int $rangeMin, int $rangeMax )
+    {
+        int $a = 0;
+        for ($a = $rangeMin; $a < ($rangeMax + 1); $a++)
+        {
+            string $vertexName = $avatarMeshName + ".vtx[" + $a + "]";
+            skinPercent -tv ($skeletorArrayName[$indexJoint]) 1.0 $skinClusterName $vertexName;
+        }
+    }
+
+    global proc CreateHumanIKProceduralAvatar ()
+    {
+        string $root[] = `ls -sl`;
+        string $rootHierarchy[] = {};
+        $rootHierarchy[0] = $root[0];
+
+        string $rootJoints[] = `listRelatives -ad -type "transform" $root[0]`;
+
+        //return $roootHierarchy;
+        int $i = 0;
+        for ($i = 0; $i < size($rootJoints); $i++)
+        {
+            $rootHierarchy[$i + 1] = $rootJoints[$i];
+
+        }
+
+        $i = 0;
+        for ($i = 0; $i < size($rootHierarchy); $i++)
+        {
+            print ($rootHierarchy[$i] + " " + string($i) + "\n"); 
+        }
+
+        string $character = "test_CS";
+        string $characterName = "";
+
+        if( `objExists $character`)
+        {
+            print "Existe";
+            $characterName = `hikCreateCharacter($character)`;
+            $character = $characterName;
+
+        }
+        else
+        {
+            print "No Existe";
+            $characterName = `hikCreateCharacter($character)`;
+        }
+
+        print ($characterName + "\n");
+
+        setCharacterObject($rootHierarchy[0],$characterName,0,0);
+        setCharacterObject($rootHierarchy[65],$characterName,1,0); 
+        setCharacterObject($rootHierarchy[54],$characterName,8,0); 
+        setCharacterObject($rootHierarchy[53],$characterName,23,0);
+        setCharacterObject($rootHierarchy[52],$characterName,24,0);
+        setCharacterObject($rootHierarchy[27],$characterName,18,0);
+        setCharacterObject($rootHierarchy[51],$characterName,19,0);
+        setCharacterObject($rootHierarchy[26],$characterName,9,0);
+        setCharacterObject($rootHierarchy[50],$characterName,12,0);
+        setCharacterObject($rootHierarchy[25],$characterName,10,0);
+        setCharacterObject($rootHierarchy[49],$characterName,13,0);
+        setCharacterObject($rootHierarchy[24],$characterName,11,0);
+        setCharacterObject($rootHierarchy[48],$characterName,14,0);
+        setCharacterObject($rootHierarchy[7],$characterName,50,0);
+        setCharacterObject($rootHierarchy[31],$characterName,74,0);
+        setCharacterObject($rootHierarchy[6],$characterName,51,0);
+        setCharacterObject($rootHierarchy[30],$characterName,75,0);
+        setCharacterObject($rootHierarchy[5],$characterName,52,0);
+        setCharacterObject($rootHierarchy[29],$characterName,76,0);
+        setCharacterObject($rootHierarchy[4],$characterName,53,0);
+        setCharacterObject($rootHierarchy[28],$characterName,77,0);
+        setCharacterObject($rootHierarchy[11],$characterName,54,0);
+        setCharacterObject($rootHierarchy[35],$characterName,78,0);
+        setCharacterObject($rootHierarchy[10],$characterName,55,0);
+        setCharacterObject($rootHierarchy[34],$characterName,79,0);
+        setCharacterObject($rootHierarchy[9],$characterName,56,0);
+        setCharacterObject($rootHierarchy[33],$characterName,80,0);
+        setCharacterObject($rootHierarchy[8],$characterName,57,0);
+        setCharacterObject($rootHierarchy[32],$characterName,81,0);
+        setCharacterObject($rootHierarchy[15],$characterName,58,0);
+        setCharacterObject($rootHierarchy[39],$characterName,82,0);
+        setCharacterObject($rootHierarchy[14],$characterName,59,0);
+        setCharacterObject($rootHierarchy[38],$characterName,83,0);
+        setCharacterObject($rootHierarchy[13],$characterName,60,0);
+        setCharacterObject($rootHierarchy[37],$characterName,84,0);
+        setCharacterObject($rootHierarchy[12],$characterName,61,0);
+        setCharacterObject($rootHierarchy[36],$characterName,85,0);
+        setCharacterObject($rootHierarchy[19],$characterName,62,0);
+        setCharacterObject($rootHierarchy[43],$characterName,86,0);
+        setCharacterObject($rootHierarchy[18],$characterName,63,0);
+        setCharacterObject($rootHierarchy[42],$characterName,87,0);
+        setCharacterObject($rootHierarchy[17],$characterName,64,0);
+        setCharacterObject($rootHierarchy[41],$characterName,88,0);
+        setCharacterObject($rootHierarchy[16],$characterName,65,0);
+        setCharacterObject($rootHierarchy[40],$characterName,89,0);
+        setCharacterObject($rootHierarchy[23],$characterName,66,0);
+        setCharacterObject($rootHierarchy[47],$characterName,90,0);
+        setCharacterObject($rootHierarchy[22],$characterName,67,0);
+        setCharacterObject($rootHierarchy[46],$characterName,91,0);
+        setCharacterObject($rootHierarchy[21],$characterName,68,0);
+        setCharacterObject($rootHierarchy[45],$characterName,92,0);
+        setCharacterObject($rootHierarchy[20],$characterName,69,0);
+        setCharacterObject($rootHierarchy[44],$characterName,93,0);
+        setCharacterObject($rootHierarchy[59],$characterName,2,0);
+        setCharacterObject($rootHierarchy[64],$characterName,5,0);
+        setCharacterObject($rootHierarchy[58],$characterName,3,0);
+        setCharacterObject($rootHierarchy[63],$characterName,6,0);
+        setCharacterObject($rootHierarchy[57],$characterName,4,0);
+        setCharacterObject($rootHierarchy[62],$characterName,7,0);
+        setCharacterObject($rootHierarchy[56],$characterName,16,0);
+        setCharacterObject($rootHierarchy[61],$characterName,17,0);
+        setCharacterObject($rootHierarchy[3],$characterName,20,0);
+        setCharacterObject($rootHierarchy[2],$characterName,15,0);
+
+        hikToggleLockDefinition();
+        hikCreateControlRig;
+
+    }   
 }

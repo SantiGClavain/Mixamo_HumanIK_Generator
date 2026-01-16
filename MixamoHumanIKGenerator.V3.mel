@@ -66,6 +66,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc StartHumanIKGeneratorCheck (string $nameCharacterTxtFieldGrp)  /// EDIT     proc StartHumanIKGenerator (string $nameCharacterTxtFieldGrp, string $offsetIntGrpName)  
     {
+        print ("Running: StartHumanIKGeneratorCheck \n");
         string $nameCharacterTxtFieldGrpText = `textFieldGrp -q -tx $nameCharacterTxtFieldGrp`;
         if ($nameCharacterTxtFieldGrpText == "" ) 
         {
@@ -99,7 +100,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc CreateMixamoHumanIK (string $hipJoint, string $character)    //Esta funci�n sirve para crear un Human IK a partir de una jerarqu�a de mixamo, tiene en cuenta si tiene namespace, pero no tiene en cuenta la ruta completa de los nombres cuando hay m�s de un esqueleto en escena.
     {    
-          
+        print ("Running: CreateMixamoHumanIK \n"); 
         //Esto es para detectar si hay un root INIT
         
         string $nameSpaceList[] = `ls -showNamespace $hipJoint`;
@@ -388,6 +389,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc ResetMixamoCharacter (string $nameCharacterReset) //Esta funci�n selecciona toda la jerarqu�a de joints y las resetea, solo sirve para jerarqu�as exportadas de Mixamo -------- EDIT     proc ResetMixamoCharacter (string $nameCharacterReset, int $offsetFrame)
     {
+        print ("Running: ResetMixamoCharacter \n");
         int $storedTime = `currentTime -query`;
     
         string $selectionList[] = `ls -sl`;
@@ -420,12 +422,15 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
         select -hierarchy;
         timeSliderClearKey;  
         
-        currentTime $storedTime;
+        print ("Ending: ResetMixamoCharacter \n");
+
+        currentTime $storedTime;    
                              
     }
     
     proc CharacterKeyFrameOffset (int $offsetTime) //Esta funci�n selecciona la jerarqu�a del objeto seleccionado y mueve todos los KF seleccionables una cantidad dada ($offsetTime)
-    {    
+    {   
+        print ("Running: CharacterKeyFrameOffset \n"); 
         string $selList[] = `ls -sl`; 
         string $jointHip = $selList[0];
         select -r $jointHip;
@@ -441,6 +446,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc CharacterKeyFrameOffsetWindow (string $offsetTimeGrp)
     {   
+        print ("Running: CharacterKeyFrameOffsetWindow \n");    
         int $offsetTime = `intField -q -v $offsetTimeGrp`; 
         string $selList[] = `ls -sl`; 
         string $jointHip = $selList[0];
@@ -470,6 +476,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc int GetFirstKey (string $jointHipGetFirstKey)        //Esta funci�n nos permite poder acceder al primer keyframe del channel box de una jerarqu�a y nos devuelve el frame que corresponde
     {
+        print ("Running: GetFirstKey \n");
 
        int $storedTimelineMin = `playbackOptions -q -min`;
        int $storedTimelineMax = `playbackOptions -q -max`;
@@ -487,6 +494,8 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc int CalculeRelativeOffset (int $firstKeyFrame)    //Esta funci�n toma el valor del current time y nos hace la diferencia respecto al valor $firstKeyFrame
     {
+        print ("Running: CalculeRelativeOffset \n");
+
         int $OffsetToSet = 0;
         int $currentKF =  `currentTime -q`;
                 
@@ -497,6 +506,8 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc InvalidHikCharactersCleaner()
     {
+        print ("Running: InvalidHikCharactersCleaner \n");
+
         string $hikCharList[] = `hikGetSceneCharacters`;
 
         for ($hikCharName in $hikCharList)
@@ -513,7 +524,8 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     }
     
     proc SetTemporalNamespace (string $hipObject)
-    {      
+    {
+        print ("Running: SetTemporalNamespace \n");      
         string $skeleton[] = `GetRealTransformHierarchy $hipObject`;
         
         string $temporalNamespace = "SantiTemporalNameSpace";
@@ -563,7 +575,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc string[] GetRealTransformHierarchy (string $object)
     {
-         
+        print ("Running: GetRealTransformHierarchy \n");       
          string $hierarchy[];
          
          $hierarchy[0] = $object;
@@ -580,7 +592,9 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     }    
     
     proc string GetSingleNamespace (string $proposedNamespace)
-    {        
+    {   
+        print ("Running: GetSingleNamespace \n");       
+
         int $isNamespace = `namespace -exists (":" + $proposedNamespace)`;
         if($isNamespace != 0)
         {
@@ -593,10 +607,14 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc RemoveLastNamespace (string $hipsTempNamespaced)
     {
+        print ("Running: RemoveLastNamespace \n");       
+
         string $namesp[] = `ls -showNamespace $hipsTempNamespaced`;
         string $buffer[];
         string $namespace = $namesp[1];
         
+        print ("Namespace is: " + $namespace);
+
         $buffer = stringToStringArray ($namespace, ":");    
         
         if (size($buffer) == 1) //
@@ -614,6 +632,7 @@ NOTA: Para que estos Scritps funcionen de forma eficiente y teniendo en cuenta l
     
     proc changeDrawStyleToBone ()
     {
+        print ("Running: changeDrawStyleToBone \n");       
         string $sel[] = `ls -sl`;
         int $i = 0;
     
